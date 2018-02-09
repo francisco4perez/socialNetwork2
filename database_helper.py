@@ -39,18 +39,14 @@ def get_user(email,token):
         result.append({'email':rows[index][0], 'token':rows[index][2], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
     return result
 
-#get all the messages about a user depending of his email
+
 def get_messages(email):
-	result = []
-    # prepare statement to get values depending of the email and the token
-    cursor = g.db.execute("select * from messages where úser_id = ?", [email])
+    result = []
+    # comment
+    cursor = g.db.execute("select * from messages where user_id = ?",email)
     rows = cursor.fetchall()
     cursor.close()
-    # return all messages with the writer and the content of the given email
+    # commment
     for index in range(len(rows)):
-        result.append({'writer_id':rows[index][2], 'content':rows[index][3]})
+        result.append({"writer_id":rows[index][2], "content":rows[index][3]})
     return result
-
-
-
-
