@@ -24,7 +24,7 @@ def main():
 def signin_user():
     email = request.get_json()['email']
     password = request.get_json()['password']
-    result = database_helper.get_user(email, password)
+    result = database_helper.get_user_by_password(email, password)
     if result == True:
         return 'User signed in', 200
     else:
@@ -51,7 +51,7 @@ def search():
 @app.route('/savecontact', methods=['POST'])
 def save_contact():
 
-  
+
 
 
     firstname = request.get_json()['firstname']
