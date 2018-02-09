@@ -27,6 +27,15 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country)
     except:
         return False
 
+#Informations about the user by his email and password
+def get_user_by_password(email,password):
+	result = []
+    # prepare statement to get values depending of the email and the password
+    cursor = g.db.execute("select * from users where email = ? and password = ?", [email, password])
+	result = cursor.fetchall()
+	return result
+
+
 #get all the informations about a user depending of his token or email
 def get_user(email,token):
     result = []
