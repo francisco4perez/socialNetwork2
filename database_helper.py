@@ -16,7 +16,7 @@ def close_db():
     if db is not None:
         db.close()
 
-#Insert a new user in the database 
+#Insert a new user in the database
 def insert_user(email,password,token,firstname, familyname, gender,city,country):
     result = []
     try:
@@ -27,14 +27,12 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country)
     except:
         return False
 
-#Informations about the user by his email and password
 def get_user_by_password(email,password):
-	result = []
-    # prepare statement to get values depending of the email and the password
-    cursor = g.db.execute("select * from users where email = ? and password = ?", [email, password])
-	result = cursor.fetchall()
-	return result
-
+    result = []
+    cursor = g.db.execute("select * from users where email = ? and password = ?",[email,password])
+    result = cursor.fetchall()
+    print result
+    return result
 
 #get all the informations about a user depending of his token or email
 def get_user(email,token):
@@ -43,7 +41,7 @@ def get_user(email,token):
     cursor = g.db.execute("select * from users where email = ? and token = ?", [email, token])
     rows = cursor.fetchall()
     cursor.close()
-    
+
     for index in range(len(rows)):
         result.append({'email':rows[index][0], 'token':rows[index][2], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
     return result
