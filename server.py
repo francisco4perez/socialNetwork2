@@ -3,14 +3,6 @@ from flask import Flask
 import database_helper
 import json
 
-
-#Lesson 3,
-#Subject: Server-side programming
-#Date and time: Monday, February 6th 2018. 010:15-12:00 am.
-#Location: T1, C huset, Campus Valla.
-#Author: Sahand Sadjadee
-
-
 app = Flask(__name__)
 app.debug = True
 
@@ -22,6 +14,25 @@ def before_request():
 @app.teardown_request
 def teardown_request(exception):
     database_helper.close_db()
+
+
+@app.route('/')
+def main():
+    return app.send_static_file('hello_world.html')
+
+@app.route('/signin', methods=['POST'])
+def signin_user():
+    email = request.get_json()['email']
+    password = request.get_json()['password']
+    result = database_helper.get_user(email, password)
+    if result == True:
+        return 'User signed in', 200
+    else:
+        return 'Authentification failed', 501
+
+
+if __name__ == '__main__':
+    app.run()
 
 '''
 @app.route('/')
@@ -64,17 +75,4 @@ def get_contact(firstname = None, familyname = None):
             return json.dumps(result), 200
     else:
         return "", 404
-
-
-if __name__ == '__main__':
-    app.run()
 '''
-@app.route('/signin', methods=['POST'])
-def signin_user():
-    email = request.get_json()['email']
-    password = request.get_json()['password']
-    result = database_helper.get_user(email, password)
-    if result == True:
-        return 'User signed in', 200
-    else:
-        return 'Authentification failed', 501
