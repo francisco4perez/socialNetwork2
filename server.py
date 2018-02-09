@@ -23,7 +23,7 @@ def before_request():
 def teardown_request(exception):
     database_helper.close_db()
 
-
+'''
 @app.route('/')
 @app.route('/save')
 def save():
@@ -68,3 +68,13 @@ def get_contact(firstname = None, familyname = None):
 
 if __name__ == '__main__':
     app.run()
+'''
+@app.route('/signin', methods=['POST'])
+def signin_user():
+    email = request.get_json()['email']
+    password = request.get_json()['password']
+    result = database_helper.get_user(email, password)
+    if result == True:
+        return 'User signed in', 200
+    else:
+        return 'Authentification failed', 501
