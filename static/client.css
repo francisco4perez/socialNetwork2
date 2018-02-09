@@ -1,0 +1,251 @@
+body{
+	margin: 0px;
+	background-color:#1da1f2;
+	position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	height: 100%;
+}
+.container{
+	margin-left: auto;
+    margin-right: auto;
+	width:600px;
+	margin-top:100px;
+}
+
+#left-side{
+	float:left;
+	margin-right:10px;
+}
+h3{
+	text-align:center;
+	margin-top:inherit;
+	margin-bottom: 15px;
+}
+#right-side{
+	float:right;
+	width:250px;
+	height:400px;
+	background-color: white;
+}
+#signup{
+	height: 273px;
+}
+
+
+#login {
+    margin-bottom: 7px;
+    vertical-align: bottom;
+    height: 120px;
+}
+
+.row{
+	height:25px;
+	padding :0px 10px 0px 10px;
+}
+
+
+.welcomeinput {
+    width: 100px;
+    text-align: center;
+    float: right;
+    height: 19px;
+    margin-right: 10px;
+	border-width: 2px;
+}
+
+.welcomebutton {
+    height: 25px;
+    width: 75px;
+    margin-left: 15px;
+    margin-top: 5px;
+}
+
+
+#gender {
+    width: 104px;
+    float: right;
+    box-sizing: border-box;
+    height: 25px;
+    margin-right: 10px;
+}
+
+
+label {
+    margin-bottom: 0px;
+    float: left;
+    margin-top: 5.5px;
+    margin-left: 15px;
+}
+
+.label_pass{
+	margin-bottom: 0px;
+    float: left;
+    margin-top: 0px;
+    margin-left: 15px;
+}
+
+
+.center{
+	text-align: center;
+}
+
+
+/* Navigation styles -------------------- */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: red;
+}
+/* Home page styles ----------------------*/
+
+/* profile part*/
+#profile{
+	margin-top:50px;
+	margin-left:30%;
+}
+
+#profilepicture{
+	height:150px;
+	float:left;
+	margin-right:20px;
+}
+
+#homeusername{
+	font-size:35px;
+}
+#homeemail{
+	font-style:oblique;
+	padding-top:10px;
+}
+
+#wall{
+	margin-top:100px;
+}
+
+
+/* wall part -------------------*/
+
+.inputprofile{
+	padding: 10px 25px;
+	width:40%;
+	margin-left:20%;
+}
+.basicbutton{
+	 background-color: red;
+    border: none;
+    color: white;
+    padding: 16px 16px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+#refreshbutton{
+	 background-color: black;
+}
+
+
+#home{
+	display:block;
+	margin-top: 90px;
+}
+
+
+#messages{
+
+	margin-top:20px;
+	margin-left:20%;
+	margin-right:20%;
+
+}
+
+.postername{
+	font-style:oblique;
+
+}
+.postermessage{
+	font-size:25px;
+	margin-bottom:15px;
+	overflow: auto;
+}
+
+.posternameothers{
+	text-align:right;
+	font-style:oblique;
+	color:#800000;
+
+}
+.postermessageothers{
+	font-size:25px;
+	margin-bottom:15px;
+	color:#800000;
+	text-align:right;
+	overflow: auto;
+}
+
+
+/* Browse style ------------------*/
+
+img#searchicon{
+	height:20px;
+	padding-top:30px;
+	cursor:pointer;
+	margin-left:-40px;
+}
+#search{
+	border-radius: 25px;
+	margin-left:25%;
+}
+
+#browse{
+	display: none;
+	margin-top:30px;
+}
+
+/* Account style ---------------- */
+
+#title{
+	text-align: center;
+}
+
+.form_input_text{
+	font-size: 20px;
+}
+
+.add_top_margin{
+	margin-top: 30px;
+}
+
+.black_button{
+	background-color: black;
+    border: none;
+    color: white;
+    padding: 16px 16px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+}

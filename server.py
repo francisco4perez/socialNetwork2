@@ -18,7 +18,7 @@ def teardown_request(exception):
 
 @app.route('/')
 def main():
-    return app.send_static_file('hello_world.html')
+    return app.send_static_file('client.html')
 
 @app.route('/signin', methods=['POST'])
 def signin_user():
