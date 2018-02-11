@@ -20,7 +20,7 @@ def teardown_request(exception):
 def main():
     return app.send_static_file('client.html')
 
-@app.route('/signin', methods=['POST'])
+@app.route('/signin', methods=['PUT'])
 def signin_user():
     email = request.get_json()['email']
     password = request.get_json()['password']
@@ -29,6 +29,17 @@ def signin_user():
         return 'User signed in', 200
     else:
         return 'Authentification failed', 501
+
+@app.route('/getdatabytoken/<token>', methods=['GET'])
+def get_user_data_by_token(token):
+	if token != None :
+		result = database_helper.get_user_by_token(token)
+		if len(result) == 0:
+			return 'Profile not found', 404
+		else:
+			return json.dumps(result), 200
+	else:
+		return "", 404
 
 
 if __name__ == '__main__':
