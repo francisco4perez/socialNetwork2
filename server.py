@@ -2,6 +2,7 @@ from flask import app, request
 from flask import Flask
 import database_helper
 import json
+import random
 
 app = Flask(__name__)
 app.debug = True
@@ -30,20 +31,30 @@ def verify_password(email, password):
     except:
         return False
 
+#method that return true if the user with the password and email in parameters exists
 @app.route('/signin', methods=['PUT'])
 def sign_in():
-    print "this is my request" + str(request)
-    print request.get_json()
+    # get parameters
     email = request.get_json()['email']
     password = request.get_json()['password']
+    # verify that the user exists
     if verify_password(email,password):
-        return 'User signed in', 200
+        #create a random token
+        letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        token = ""
+        for i in range(36) :
+            token += letters[int(random.uniform(0,36))]
+            # insert token in the database
+            
+        return token, 200
     else:
         return 'Authentification failed', 501
 
+# method that insert a new contact in the dabase if the email is not already used
 @app.route('/signup',methods=['PUT'])
 def sign_up():
     try:
+        # get all parameters
         email = request.get_json()['email']
         password = request.get_json()['password']
         firstname = request.get_json()['firstname']
@@ -51,14 +62,18 @@ def sign_up():
         gender = request.get_json()['gender']
         city = request.get_json()['city']
         country = request.get_json()['country']
+        # test if the values are not empty and if the password is at least 6 caracters long
         if len(email)!=0 and len(password)>=6 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
             exist = database_helper.get_user_by_email(email)
-            if exist:
-                return 'User signed up', 200
-        else:
-            return 'Authentification failed', 501
+            # if the user doesn't already exist, add the new profile in the database
+            if not exist:
+                database_helper.insert_user(email,password,"",firstname,familyname,gender,city,country)
+                return 'User added', 200
+            else:
+                return 'User already exist', 409
+        return 'Wrong parameters', 404
     except:
-        return 'Not enough parameters',404
+        return 'Something went wrong',500
 
 
 @app.route('/getdatabytoken/<token>', methods=['GET'])
