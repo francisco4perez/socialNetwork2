@@ -41,6 +41,36 @@ def get_user_data_by_token(token):
 	else:
 		return "", 404
 
+'''
+@app.route('/changepassword/<token>', methods=['GET'])
+def changePassword_data(token):
+    if token != None :
+        result = database_helper.get_user_by_token(token)
+        if len(result) == 0:
+            return 'Profile not found', 404
+        else:
+            return json.dumps(result), 200
+    else:
+        return "", 404
+
+'''
+
+@app.route('/changepassword/<token>', methods=['POST'])
+def changePassword_data(token):
+    if token != None :
+        result = database_helper.get_user_by_token(token)
+        oldPass = request.get_json()["oldPass"]
+        newPass = request.get_json()["newPass"]
+
+        
+
+        if len(result) == 0:
+            return 'Profile not found', 404
+        else:
+            return json.dumps(result), 200
+    else:
+        return "", 404
+
 
 if __name__ == '__main__':
     app.run()
