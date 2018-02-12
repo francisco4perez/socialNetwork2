@@ -44,11 +44,14 @@ def sign_in():
         token = ""
         for i in range(36) :
             token += letters[int(random.uniform(0,36))]
-            # insert token in the database
-            
-        return token, 200
+        # insert token in the database
+        result = database_helper.update_token(token,email)
+        if result :
+			return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
+        else :
+			return '{"success": false, "message": "Wrong username or password."}', 501
     else:
-        return 'Authentification failed', 501
+        return '{"success": false, "message": "Wrong username or password."}', 501
 
 # method that insert a new contact in the dabase if the email is not already used
 @app.route('/signup',methods=['PUT'])
@@ -62,31 +65,57 @@ def sign_up():
         gender = request.get_json()['gender']
         city = request.get_json()['city']
         country = request.get_json()['country']
+		
         # test if the values are not empty and if the password is at least 6 caracters long
         if len(email)!=0 and len(password)>=6 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
             exist = database_helper.get_user_by_email(email)
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
                 database_helper.insert_user(email,password,"",firstname,familyname,gender,city,country)
-                return 'User added', 200
+                return '{"success": true, "message": "Successfully created a new user."}', 200
             else:
-                return 'User already exist', 409
-        return 'Wrong parameters', 404
+                return '{"success": false, "message": "User already exists."}', 409
+        return '{"success": false, "message": "Form data missing or incorrect type."}', 404
     except:
-        return 'Something went wrong',500
+        return '{"success": false, "message": Something went wrong"}',500
 
-
+#return data of a user given his token
 @app.route('/getdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token):
 	if token != None :
 		result = database_helper.get_user_by_token(token)
 		if len(result) == 0:
-			return 'Profile not found', 404
+			return '{"success": false, "message": "No such user."}', 404
 		else:
-			return json.dumps(result), 200
+			return '{"success": true, "message": "User data retrieved.", "data":"' + json.dumps(result)+'"}', 200
 	else:
-		return "", 404
+		return '{"success": false, "message": "You are not signed in."}', 401
 
+#get all the messages of a user given his token
+@app.route('/getusermessagesbytoken/<token>',methods=['GET'])
+def get_user_messages_by_token(token):
+	if token != None :
+		result = database_helper.get_user_by_token(token)
+		#if this token doesn't exist in the database, return error status
+		if not result :
+			return '{"success": false, "message": "You are not signed in."}', 401
+		return get_user_messages_by_email(token,result[0]['email'])
+	else:
+		return '{"success": false, "message": "You are not signed in."}', 401
+
+#get all the messages of a profile given his email if the user is signed in
+@app.route('/getusermessagesbyemail/<token>/<email>',methods=['GET'])
+def get_user_messages_by_email(token,email):
+	if email != None :
+		exist = database_helper.get_user_by_token(token)
+		if exist:
+			#search messages in the database with th given email
+			result = database_helper.get_messages(email)
+			return '{"success": true, "message": "User messages retrieved.", "data":"' + str(result) +'"}',200
+		else :
+			return '{"success": false, "message": "You are not signed in."}', 401
+	else:
+		return '{"success": false, "message": "Form data missing or incorrect type."}', 404
 '''
 @app.route('/changepassword/<token>', methods=['GET'])
 def changePassword_data(token):

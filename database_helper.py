@@ -27,6 +27,16 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country)
     except:
         return False
 
+#update the token of the user with the corresponding address
+def update_token(token,email):
+    result = []
+    try:
+        #prepare statement to insert new token 
+        cur = g.db.execute("update users set token = ? where email = ?", [token, email])
+        g.db.commit()
+        return True
+    except:
+        return False
 
 #Change the password in the database
 def change_password(token,oldPassword,newPassword):
@@ -46,7 +56,6 @@ def get_user_by_token(token):
     cursor.close()
     for index in range(len(rows)):
         result.append({'email':rows[index][0], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
-    #print result
     return result
 
 #get all information about a user depending of his email
@@ -65,20 +74,21 @@ def get_user_by_email_and_password(email,password):
     result = []
     # prepare statement to get values depending of the email and the token
     cursor = g.db.execute("select * from users where email = ? and password = ?", [email,password])
+    print 'hello'
     rows = cursor.fetchall()
     cursor.close()
     for index in range(len(rows)):
         result.append({'email':rows[index][0],'password':rows[index][1], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
     return result
 
-
+#get all messages of a profile given his email
 def get_messages(email):
     result = []
-    # comment
-    cursor = g.db.execute("select * from messages where user_id = ?",email)
+    # prepare statement to get all the messages corresponding to this email
+    cursor = g.db.execute("select * from messages where user_id = ?",[email])
     rows = cursor.fetchall()
     cursor.close()
-    # commment
+    # append all the messages
     for index in range(len(rows)):
         result.append({"writer_id":rows[index][2], "content":rows[index][3]})
     return result
