@@ -20,15 +20,46 @@ def teardown_request(exception):
 def main():
     return app.send_static_file('client.html')
 
+def verify_password(email, password):
+    result = database_helper.get_user_by_email_and_password(email,password)
+    try :
+        if result:
+            return True
+        else :
+            return False
+    except:
+        return False
+
 @app.route('/signin', methods=['PUT'])
-def signin_user():
+def sign_in():
+    print "this is my request" + str(request)
+    print request.get_json()
     email = request.get_json()['email']
     password = request.get_json()['password']
-    result = database_helper.get_user_by_password(email, password)
-    if result == True:
+    if verify_password(email,password):
         return 'User signed in', 200
     else:
         return 'Authentification failed', 501
+
+@app.route('/signup',methods=['PUT'])
+def sign_up():
+    try:
+        email = request.get_json()['email']
+        password = request.get_json()['password']
+        firstname = request.get_json()['firstname']
+        familyname = request.get_json()['familyname']
+        gender = request.get_json()['gender']
+        city = request.get_json()['city']
+        country = request.get_json()['country']
+        if len(email)!=0 and len(password)>=6 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
+            exist = database_helper.get_user_by_email(email)
+            if exist:
+                return 'User signed up', 200
+        else:
+            return 'Authentification failed', 501
+    except:
+        return 'Not enough parameters',404
+
 
 @app.route('/getdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token):
