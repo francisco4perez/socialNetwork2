@@ -59,6 +59,7 @@ def sign_up():
     try:
         # get all parameters
         email = request.get_json()['email']
+        print email
         password = request.get_json()['password']
         firstname = request.get_json()['firstname']
         familyname = request.get_json()['familyname']
@@ -77,7 +78,7 @@ def sign_up():
                 return '{"success": false, "message": "User already exists."}', 409
         return '{"success": false, "message": "Form data missing or incorrect type."}', 404
     except:
-        return '{"success": false, "message": Something went wrong"}',500
+        return '{"success": false, "message": "Something went wrong"}',500
 
 #return data of a user given his token
 @app.route('/getdatabytoken/<token>', methods=['GET'])
@@ -116,6 +117,33 @@ def get_user_messages_by_email(token,email):
 			return '{"success": false, "message": "You are not signed in."}', 401
 	else:
 		return '{"success": false, "message": "Form data missing or incorrect type."}', 404
+
+#post a message on a profile with the email of the writer and his message
+@app.route('/postmessage',methods=["POST"])
+def post_message():
+	try:
+        # get all parameters
+		token = request.get_json()['token']
+		message = request.get_json()['message']
+		email = request.get_json()['email']
+		existtoken = database_helper.get_user_by_token(token)
+		existemail = database_helper.get_user_by_email(email)
+		if existtoken:
+			if existemail :
+				#get the name of the writer
+				writer = existtoken[0]['email']
+				result = database_helper.insert_message(email,writer,message)
+				if result :
+					return '{"success": true, "message": "the message has been posted"}', 200
+				else : 
+					return '{"success": false, "message": "A problem has occured in the database"}', 500
+			else :
+				return '{"success": false, "message": "this email does not exist"}', 401
+		else :
+			return '{"success": false, "message": "You are not signed in."}', 401
+	except:
+		return '{"success": false, "message": "Something went wrong"}',500
+
 '''
 @app.route('/changepassword/<token>', methods=['GET'])
 def changePassword_data(token):

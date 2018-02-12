@@ -92,3 +92,13 @@ def get_messages(email):
     for index in range(len(rows)):
         result.append({"writer_id":rows[index][2], "content":rows[index][3]})
     return result
+
+# insert a new message on the messages table with a content, a writer and and the current profile
+def insert_message(user_id,writer, content):
+    try:
+		#prepare statement to insert values in the messages table
+		cur = g.db.execute("insert into messages values(null,?,?,?)", [user_id,writer,content])
+		g.db.commit()
+		return True
+    except:
+        return False
