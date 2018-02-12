@@ -49,12 +49,17 @@ def get_user_by_email(email):
         result.append({'email':rows[index][0], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
     return result
 
-#get all information about a user depending of his password and email
-def get_user_by_password(email,password):
+#get all information about a user depending of his email and password
+def get_user_by_email_and_password(email,password):
     result = []
-    cursor = g.db.execute("select * from users where email = ? and password = ?",[email,password])
-    result = cursor.fetchone()
+    # prepare statement to get values depending of the email and the token
+    cursor = g.db.execute("select * from users where email = ? and password = ?", [email,password])
+    rows = cursor.fetchall()
+    cursor.close()
+    for index in range(len(rows)):
+        result.append({'email':rows[index][0],'password':rows[index][1], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
     return result
+
 
 def get_messages(email):
     result = []
