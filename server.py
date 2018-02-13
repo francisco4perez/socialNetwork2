@@ -89,14 +89,12 @@ def changePassword_data(token):
 @app.route('/changepassword/<token>', methods=['POST'])
 def changePassword_data(token):
     if token != None :
-        result = database_helper.get_user_by_token(token)
+        user = database_helper.get_user_by_token(token)[0]
         oldPass = request.get_json()["oldPass"]
         newPass = request.get_json()["newPass"]
 
-        
-
-        if len(result) == 0:
-            return 'Profile not found', 404
+        if verify_password(user["email"],oldPass):
+            return database_helper.change_password(token,oldPass,newPass)
         else:
             return json.dumps(result), 200
     else:

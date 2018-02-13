@@ -30,13 +30,9 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country)
 
 #Change the password in the database
 def change_password(token,oldPassword,newPassword):
-    user = get_user_by_token(token)
-    print user
-    print user["email"]
-    print user["firstname"]
-    cursor = g.db.execute("select * from users where email = ? and password = ?",[email,password])
-    result = cursor.fetchone()
-    return result 
+    user = get_user_by_token(token)[0]
+    query = g.db.execute("update users set password = ? where email = ?",[newPassword,user["email"]])
+    return query
 
 #get all information about a user depending of his token
 def get_user_by_token(token):
