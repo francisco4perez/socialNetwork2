@@ -161,7 +161,13 @@ def changePassword_data(token):
 @app.route('/changepassword/<token>', methods=['POST'])
 def changePassword_data(token):
     if token != None :
-        user = database_helper.get_user_by_token(token)[0]
+        result = database_helper.get_user_by_token(token)
+
+        if len(result) != 0:
+            user = result[0]
+        else:
+            return "There is no user with such token!", 200
+
         oldPass = request.get_json()["oldPass"]
         newPass = request.get_json()["newPass"]
 

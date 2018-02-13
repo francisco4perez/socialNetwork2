@@ -41,8 +41,12 @@ def update_token(token,email):
 #Change the password in the database
 def change_password(token,oldPassword,newPassword):
     user = get_user_by_token(token)[0]
-    query = g.db.execute("update users set password = ? where email = ?",[newPassword,user["email"]])
-    return query
+    print user["email"]
+    print newPassword
+    query = g.db.execute("update users set password = ? where token = ?",[newPassword,token])
+    g.db.commit()
+    query.close()
+    return "Changed!"
 
 #get all information about a user depending of his token
 def get_user_by_token(token):
