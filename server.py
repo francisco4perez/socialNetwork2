@@ -86,11 +86,18 @@ def sign_up():
 @app.route('/signout',methods=['PUT'])
 def sign_out():
     token = request.get_json()['token']
+    result = database_helper.get_user_by_token(token)
+
+    if len(result) == 0:
+        return '{"success": false, "message": "No such token"}',400
+
     if token != None:
-        database_helper.delete_token(token)
-        return "Signout Successfull!", 500
+        if database_helper.delete_token(token):
+            return '{"success": true, "message": "Signout Successfull!."}', 200
+        else:
+            return '{"success": false, "message": "Something went wrong"}',500
     else:
-        return "ERROR Signing out", 200
+        return '{"success": false, "message": "No token found"}',500
 
 
 #get data of a user given his token
@@ -191,10 +198,19 @@ def changePassword_data(token):
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
 
-        if verify_password(user["email"],oldPass) and len(oldPass) >= 6 and oldPass == newPass :
-            return database_helper.update_password(token,oldPass,newPass), 500
+        if verify_password(user["email"],oldPass):
+            if len(oldPass) >= 6:
+                if oldPass == newPass:
+                    if database_helper.update_password(token,oldPass,newPass):
+                        return '{"success": true, "message": "Password changed"}',200
+                    else:
+                        return '{"success": false, "message": "Updating went wrong!"}',500
+                else:
+                    return '{"success": false, "message": "Passwords are not the same!"}',500
+            else:
+                return '{"success": false, "message": "Password is too short!"}',500
         else:
-            return "ERROR CHANGING PASSWORD", 200
+            return '{"success": false, "message": "Wrong old password!"}',500
     else:
         return "", 404
 
