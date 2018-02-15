@@ -192,7 +192,10 @@ def changePassword_data(token):
         newPass = request.get_json()["newpass"]
 
         if verify_password(user["email"],oldPass) and len(oldPass) >= 6 and oldPass == newPass :
-            return database_helper.update_password(token,oldPass,newPass), 500
+            if database_helper.update_password(token,oldPass,newPass):
+                return '{"success": true, "message": "Password changed"}',500
+            else:
+                return '{"success": true, "message": "Password changed"}',500
         else:
             return "ERROR CHANGING PASSWORD", 200
     else:

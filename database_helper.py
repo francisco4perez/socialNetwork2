@@ -28,19 +28,19 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country)
         return False
 
 #update the token of the user with the corresponding address
-def update_token(token):
+def update_token(token,email):
     try:
-        #prepare statement to insert new token 
-        cur = g.db.execute("update users set token = ? where token = ?", [token])
+        #prepare statement to insert new token
+        cur = g.db.execute("update users set token = ? where email = ?", [token, email])
         g.db.commit()
         return True
     except:
         return False
 
 #delete the token of the user with the corresponding address
-def delete_token(token,email):
+def delete_token(token):
     try:
-        cur = g.db.execute("update users set token = "" where email = ?", [token, email])
+        cur = g.db.execute("update users set token = "" where token = ?", [token])
         g.db.commit()
         return True
     except:
