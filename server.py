@@ -7,11 +7,12 @@ import random
 app = Flask(__name__)
 app.debug = True
 
-
+#Connect database before request
 @app.before_request
 def before_request():
     database_helper.connect_db()
 
+#Close database after request
 @app.teardown_request
 def teardown_request(exception):
     database_helper.close_db()
@@ -21,10 +22,11 @@ def teardown_request(exception):
 def main():
     return app.send_static_file('client.html')
 
+#return true if the email and password in parameter correspond to a profile in the database
 def verify_password(email, password):
     result = database_helper.get_user_by_email_and_password(email,password)
     try :
-        if result:
+        if result and len(password)>=6:
             return True
         else :
             return False
@@ -47,9 +49,9 @@ def sign_in():
         # insert token in the database
         result = database_helper.update_token(token,email)
         if result :
-			return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
+            return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
-			return '{"success": false, "message": "Wrong username or password."}', 501
+            return '{"success": false, "message": "Wrong username or password."}', 501
     else:
         return '{"success": false, "message": "Wrong username or password."}', 501
 
@@ -66,9 +68,9 @@ def sign_up():
         gender = request.get_json()['gender']
         city = request.get_json()['city']
         country = request.get_json()['country']
-		
+
         # test if the values are not empty and if the password is at least 6 caracters long
-        if len(email)!=0 and len(password)>=6 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
+        if len(email)!=0 and len(password)!=0 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
             exist = database_helper.get_user_by_email(email)
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
@@ -80,83 +82,89 @@ def sign_up():
     except:
         return '{"success": false, "message": "Something went wrong"}',500
 
-#return data of a user given his token
+#get data of a user given his token
 @app.route('/getdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token):
-	if token != None :
-		result = database_helper.get_user_by_token(token)
-		if len(result) == 0:
-			return '{"success": false, "message": "No such user."}', 404
-		else:
-			return '{"success": true, "message": "User data retrieved.", "data":"' + json.dumps(result)+'"}', 200
-	else:
-		return '{"success": false, "message": "You are not signed in."}', 401
+    if token != None :
+        result = database_helper.get_user_by_token(token)
+        if len(result) == 0:
+            return '{"success": false, "message": "No such user."}', 404
+        else:
+            return '{"success": true, "message": "User data retrieved.", "data":"' + json.dumps(result)+'"}', 200
+    else:
+        return '{"success": false, "message": "You are not signed in."}', 401
+
+#get data of a user given his token
+@app.route('/getdatabyemail/<token>/<email>', methods=['GET'])
+def get_user_data_by_email(token,email):
+    if email != None :
+        #checks if the token exist in the database
+        exist = database_helper.get_user_by_token(token)
+        if exist:
+            #search data in the database with the given email
+            result = database_helper.get_user_by_email(email)
+            if len(result) == 0:
+                return '{"success": false, "message": "No such user."}', 404
+            else:
+                return '{"success": true, "message": "User data retrieved.", "data":"' + str(result) +'"}',200
+        else :
+            return '{"success": false, "message": "You are not signed in."}', 401
+    else:
+        return '{"success": false, "message": "Form data missing or incorrect type."}', 404
+
 
 #get all the messages of a user given his token
 @app.route('/getusermessagesbytoken/<token>',methods=['GET'])
 def get_user_messages_by_token(token):
-	if token != None :
-		result = database_helper.get_user_by_token(token)
-		#if this token doesn't exist in the database, return error status
-		if not result :
-			return '{"success": false, "message": "You are not signed in."}', 401
-		return get_user_messages_by_email(token,result[0]['email'])
-	else:
-		return '{"success": false, "message": "You are not signed in."}', 401
+    if token != None :
+        result = database_helper.get_user_by_token(token)
+        #if this token doesn't exist in the database, return error status
+        if not result :
+            return '{"success": false, "message": "You are not signed in."}', 401
+        return get_user_messages_by_email(token,result[0]['email'])
+    else:
+        return '{"success": false, "message": "You are not signed in."}', 401
 
 #get all the messages of a profile given his email if the user is signed in
 @app.route('/getusermessagesbyemail/<token>/<email>',methods=['GET'])
 def get_user_messages_by_email(token,email):
-	if email != None :
-		exist = database_helper.get_user_by_token(token)
-		if exist:
-			#search messages in the database with th given email
-			result = database_helper.get_messages(email)
-			return '{"success": true, "message": "User messages retrieved.", "data":"' + str(result) +'"}',200
-		else :
-			return '{"success": false, "message": "You are not signed in."}', 401
-	else:
-		return '{"success": false, "message": "Form data missing or incorrect type."}', 404
+    if email != None :
+        exist = database_helper.get_user_by_token(token)
+        if exist:
+            #search messages in the database with th given email
+            result = database_helper.get_messages(email)
+            return '{"success": true, "message": "User messages retrieved.", "data":"' + str(result) +'"}',200
+        else :
+            return '{"success": false, "message": "You are not signed in."}', 401
+    else:
+        return '{"success": false, "message": "Form data missing or incorrect type."}', 404
 
 #post a message on a profile with the email of the writer and his message
 @app.route('/postmessage',methods=["POST"])
 def post_message():
-	try:
+    try:
         # get all parameters
-		token = request.get_json()['token']
-		message = request.get_json()['message']
-		email = request.get_json()['email']
-		existtoken = database_helper.get_user_by_token(token)
-		existemail = database_helper.get_user_by_email(email)
-		if existtoken:
-			if existemail :
-				#get the name of the writer
-				writer = existtoken[0]['email']
-				result = database_helper.insert_message(email,writer,message)
-				if result :
-					return '{"success": true, "message": "the message has been posted"}', 200
-				else : 
-					return '{"success": false, "message": "A problem has occured in the database"}', 500
-			else :
-				return '{"success": false, "message": "this email does not exist"}', 401
-		else :
-			return '{"success": false, "message": "You are not signed in."}', 401
-	except:
-		return '{"success": false, "message": "Something went wrong"}',500
+        token = request.get_json()['token']
+        message = request.get_json()['message']
+        email = request.get_json()['email']
+        existtoken = database_helper.get_user_by_token(token)
+        existemail = database_helper.get_user_by_email(email)
+        if existtoken:
+            if existemail :
+                #get the name of the writer
+                writer = existtoken[0]['email']
+                result = database_helper.insert_message(email,writer,message)
+                if result :
+                    return '{"success": true, "message": "the message has been posted"}', 200
+                else :
+                    return '{"success": false, "message": "A problem has occured in the database"}', 500
+            else :
+                return '{"success": false, "message": "this email does not exist"}', 401
+        else :
+            return '{"success": false, "message": "You are not signed in."}', 401
+    except:
+        return '{"success": false, "message": "Something went wrong"}',500
 
-'''
-@app.route('/changepassword/<token>', methods=['GET'])
-def changePassword_data(token):
-    if token != None :
-        result = database_helper.get_user_by_token(token)
-        if len(result) == 0:
-            return 'Profile not found', 404
-        else:
-            return json.dumps(result), 200
-    else:
-        return "", 404
-
-'''
 
 @app.route('/changepassword/<token>', methods=['POST'])
 def changePassword_data(token):
@@ -168,8 +176,8 @@ def changePassword_data(token):
         else:
             return "There is no user with such token!", 200
 
-        oldPass = request.get_json()["oldPass"]
-        newPass = request.get_json()["newPass"]
+        oldPass = request.get_json()["oldpass"]
+        newPass = request.get_json()["newpass"]
 
         if verify_password(user["email"],oldPass):
             return database_helper.change_password(token,oldPass,newPass)
@@ -181,46 +189,3 @@ def changePassword_data(token):
 
 if __name__ == '__main__':
     app.run()
-
-'''
-@app.route('/')
-@app.route('/save')
-def save():
-    return app.send_static_file('ui_save.html')
-
-
-
-@app.route('/search')
-def search():
-    return app.send_static_file('ui_search.html')
-
-
-
-@app.route('/savecontact', methods=['POST'])
-def save_contact():
-
-
-
-
-    firstname = request.get_json()['firstname']
-    familyname = request.get_json()['familyname']
-    phonenumber = request.get_json()['mobile']
-
-    result = database_helper.insert_contact(firstname, familyname, phonenumber)
-    if result == True:
-        return 'contact added', 200
-    else:
-        return 'could not add the contact', 501
-
-
-@app.route('/getcontact/<firstname>/<familyname>', methods=['GET'])
-def get_contact(firstname = None, familyname = None):
-    if firstname != None and familyname != None:
-        result = database_helper.get_contact(firstname, familyname)
-        if len(result) == 0:
-            return 'contact not found', 404
-        else:
-            return json.dumps(result), 200
-    else:
-        return "", 404
-'''
