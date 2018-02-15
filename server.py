@@ -82,11 +82,16 @@ def sign_up():
     except:
         return '{"success": false, "message": "Something went wrong"}',500
 
-#method that return true if the user with the password and email in parameters exists
-@app.route('/signout', methods=['PUT'])
+#method that delete the current session and the token
+@app.route('/signout',methods=['PUT'])
 def sign_out():
-    # get parameters
-    email = request.get_json()['email']
+    token = request.get_json()['token']
+    if token != None:
+        database_helper.delete_token(token)
+        return "Signout Successfull!", 500
+    else:
+        return "ERROR Signing out", 200
+
 
 #get data of a user given his token
 
@@ -186,10 +191,10 @@ def changePassword_data(token):
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
 
-        if verify_password(user["email"],oldPass):
-            return database_helper.change_password(token,oldPass,newPass)
+        if verify_password(user["email"],oldPass) and len(oldPass) >= 6 and oldPass == newPass :
+            return database_helper.update_password(token,oldPass,newPass), 500
         else:
-            return json.dumps(result), 200
+            return "ERROR CHANGING PASSWORD", 200
     else:
         return "", 404
 
