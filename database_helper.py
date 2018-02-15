@@ -40,7 +40,11 @@ def update_token(token,email):
 #delete the token of the user with the corresponding address
 def delete_token(token):
     try:
+<<<<<<< HEAD
         cur = g.db.execute("update users set token = '' where token = ?", [token])
+=======
+        cur = g.db.execute("update users set token = "" where token = ?", [token])
+>>>>>>> 4162c8f88881733c5523d64a104d7ec5c51688eb
         g.db.commit()
         cur.close()
         return True

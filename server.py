@@ -197,7 +197,7 @@ def changePassword_data(token):
 
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
-
+        
         if verify_password(user["email"],oldPass):
             if len(oldPass) >= 6:
                 if oldPass == newPass:
@@ -209,6 +209,7 @@ def changePassword_data(token):
                     return '{"success": false, "message": "Passwords are not the same!"}',500
             else:
                 return '{"success": false, "message": "Password is too short!"}',500
+
         else:
             return '{"success": false, "message": "Wrong old password!"}',500
     else:
