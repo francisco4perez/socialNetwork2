@@ -80,6 +80,13 @@ def sign_up():
     except:
         return '{"success": false, "message": "Something went wrong"}',500
 
+#method that return true if the user with the password and email in parameters exists
+@app.route('/signout', methods=['PUT'])
+def sign_out():
+    # get parameters
+    email = request.get_json()['email']
+
+
 #return data of a user given his token
 @app.route('/getdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token):
