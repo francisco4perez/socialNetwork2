@@ -2,8 +2,6 @@ __authors__ = 'Jean-Baptiste Leprince and Francisco Perez'
 import sqlite3
 from flask import g
 
-
-
 DATABASE = 'database.db'
 
 # connect the database
@@ -81,7 +79,6 @@ def get_user_by_email_and_password(email,password):
     result = []
     # prepare statement to get values depending of the email and the token
     cursor = g.db.execute("select * from users where email = ? and password = ?", [email,password])
-    print 'hello'
     rows = cursor.fetchall()
     cursor.close()
     for index in range(len(rows)):
