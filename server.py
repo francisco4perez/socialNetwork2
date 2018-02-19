@@ -24,6 +24,15 @@ def teardown_request(exception):
 def main():
     return app.send_static_file('client.html')
 
+@app.route('/api')
+def api():
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        while True:
+            message = ws.wait()
+            ws.send(message)
+    return
+
 #return true if the email and password in parameter correspond to a profile in the database
 def verify_password(email, password):
     result = database_helper.get_user_by_email_and_password(email,password)
@@ -43,13 +52,23 @@ def sign_in():
     password = request.get_json()['password']
     # verify that the user exists
     if verify_password(email,password):
+
+        # verify if the token exists in the user
+        token = database_helper.get_token_by_email(email)
+
+        if token:
+            if database_helper.delete_token(token):
+                return '{"success": true, "message": "You have to logout!."}', 444
+            else:
+                return '{"success": false, "message": "Something went wrong"}',500
+
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-        token = ""
         for i in range(36) :
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
         result = database_helper.update_token(token,email)
+
         if result :
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
