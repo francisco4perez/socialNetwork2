@@ -284,21 +284,32 @@ clicknavbutton = function(id){
 displayprofile = function(email=""){
 
 	var token = localStorage.getItem("loggedinuser");
+  var con = new XMLHttpRequest();
 	// Get the data of the user from the server depending on his token
 	if(email==""){
-		var result= serverstub.getUserDataByToken(token);
+    // open a new request to get user data by token
+    con.open("GET", '/getdatabytoken/'+token, true);
 	}else{
-		var result= serverstub.getUserDataByEmail(token,email);
+      // open a new request to get user data by email
+    con.open("GET", '/getdatabyemail/'+token +'/'+email, true);
 	}
 
-	if(result.success){
-		// display all the data of the user
-		document.getElementById("homeusername").innerText=result.data.firstname +" " + result.data.familyname;
-		document.getElementById("homegender").innerText=result.data.gender;
-		document.getElementById("homeemail").innerText=result.data.email;
-		document.getElementById("homecity").innerText=result.data.city;
-		document.getElementById("homecountry").innerText=result.data.country;
-	}
+  // when the response is back, execute this function
+  con.onreadystatechange = function () {
+
+    if(con.readyState == 4 &&con.status == 200){
+      result= JSON.parse(con.responseText);
+      // display all the data of the user
+  		document.getElementById("homeusername").innerText=result.data.firstname +" " + result.data.familyname;
+  		document.getElementById("homegender").innerText=result.data.gender;
+  		document.getElementById("homeemail").innerText=result.data.email;
+  		document.getElementById("homecity").innerText=result.data.city;
+  		document.getElementById("homecountry").innerText=result.data.country;
+    }
+  }
+  con.setRequestHeader("Content-Type", "application/json");
+  //send the request with parameter
+  con.send(null);
 	displaymessages();
 }
 

@@ -109,7 +109,7 @@ def get_user_data_by_token(token):
         if len(result) == 0:
             return '{"success": false, "message": "No such user."}', 404
         else:
-            return '{"success": true, "message": "User data retrieved.", "data":"' + json.dumps(result)+'"}', 200
+            return '{"success": true, "message": "User data retrieved.", "data":' + str(result[0])+'}', 200
     else:
         return '{"success": false, "message": "You are not signed in."}', 401
 
@@ -125,7 +125,7 @@ def get_user_data_by_email(token,email):
             if len(result) == 0:
                 return '{"success": false, "message": "No such user."}', 404
             else:
-                return '{"success": true, "message": "User data retrieved.", "data":"' + str(result) +'"}',200
+                return '{"success": true, "message": "User data retrieved.", "data":{}' + json.dumps(result[0]) +'}}',200
         else :
             return '{"success": false, "message": "You are not signed in."}', 401
     else:
@@ -199,7 +199,7 @@ def changePassword_data(token):
         #json inputs
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
-        
+
         #to verify if the oldpassword is right and has more lenght than six letters
         if verify_password(user["email"],oldPass):
             if len(oldPass) >= 6:
