@@ -45,6 +45,27 @@ def delete_token(token):
     except:
         return False
 
+def get_token_by_email(email):
+    cursor = g.db.execute("select * from users where email = ?", [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    if len(rows) != 0:
+        user = rows[0]
+        token = user[2]
+        return token
+    return ""
+
+
+#delete the token of the user with the corresponding address
+def delete_token_by_email(email):
+    try:
+        cur = g.db.execute("update users set email = '' where email = ?", [email])
+        g.db.commit()
+        cur.close()
+        return True
+    except:
+        return False
+
 #update the password in the database
 def update_password(token,oldPassword,newPassword):
     user = get_user_by_token(token)[0]

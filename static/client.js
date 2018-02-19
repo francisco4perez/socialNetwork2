@@ -137,6 +137,13 @@ signin = function(){
     		username.setCustomValidity(JSON.parse(con.responseText).message);
         formData.reportValidity();
       }
+      if (con.status==444){
+      	var token =localStorage.getItem("loggedinuser");
+      	if(token != None){
+      		signout();
+      	}
+      }
+
     }
     con.setRequestHeader("Content-Type", "application/json");
     //send the request
