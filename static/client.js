@@ -91,7 +91,7 @@ signup = function(){
           //send the request
           con.send(JSON.stringify(id));
 
-        } else {
+        } else if (con.status==501 || con.status == 409 || con.status==404){
           	// show an error message
           var email= document.getElementById("emailsignup");
           email.setCustomValidity("This email address already exists!");
@@ -113,6 +113,7 @@ signin = function(){
 		//receive the token from the server and see if the user exist
 		var result
 
+    var con = new XMLHttpRequest();
     // open a new request to sign in
     con.open("PUT", '/signin', true);
     // create the JSON parameters with email and password
@@ -125,21 +126,22 @@ signin = function(){
       if (con.readyState == 4 && con.status == 200) {
   			document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
   			document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
+        //parse the data receive from the server
         data = JSON.parse(con.responseText).data;
   			localStorage.setItem("loggedinuser",data);
         // display profile of the current user
         displayprofile();
-      }else {
+      }else  if (con.status==501){
         // else display an error message
     		var username = document.getElementById("emaillogin");
     		username.setCustomValidity(JSON.parse(con.responseText).message);
+        formData.reportValidity();
       }
     }
     con.setRequestHeader("Content-Type", "application/json");
     //send the request
     con.send(JSON.stringify(logform));
 
-		formData.reportValidity();
 		return false;
 }
 
@@ -151,14 +153,26 @@ clearcustomvalidity = function(field){
 //Sign-out function called when the user wants to signout from the system
 signout = function(){
 	var token =localStorage.getItem("loggedinuser");
-	serverstub.signOut(token);
-	localStorage.removeItem("loggedinuser");
-	document.getElementById("navcontainer").innerHTML= "";
-	document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
+  var con = new XMLHttpRequest();
+  // open a new request to sign in
+  con.open("PUT", '/signout', true);
+  // create the JSON parameters with email and password
+  var tokenJson = {
+      "token": token
+  };
+  // when the response is back, execute this function
+  con.onreadystatechange = function () {
+    // remove the token from the local storage
+  	localStorage.removeItem("loggedinuser");
+  	document.getElementById("navcontainer").innerHTML= "";
+  	document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
 
-	 // set homenav by default in the navbar
-	  localStorage.setItem('navbar',"homenav");
-
+  	 // set homenav by default in the navbar
+  	  localStorage.setItem('navbar',"homenav");
+  }
+  con.setRequestHeader("Content-Type", "application/json");
+  //send the request with parameter
+  con.send(JSON.stringify(tokenJson));
 }
 
 //Function to validate the forms in account view
@@ -198,16 +212,30 @@ changePassword = function(){
 		var old_pass = formData.oldpass.value.trim();
 		var new_pass = formData.newpass.value.trim();
 
-		// try to sign up with this contact
-		var result = serverstub.changePassword(token, old_pass, new_pass);
-		// show an error message
-		if(!result.success){
-			oldPassId.setCustomValidity(result.message);
-		}else{
-			messagePass.innerText = "The password was changed successfully!";
-		}
+    var con = new XMLHttpRequest();
+    // open a new request to change password
+    con.open("POST", '/changepassword/'+token, true);
+    // create the JSON parameters with old password and the new password
+    var formLogin = {
+        "newpass": new_pass,
+        "oldpass": old_pass
+    };
+    // when the response is back, execute this function
+    con.onreadystatechange = function () {
+
+  		if(con.readyState == 4 && con.status == 200){
+  				messagePass.innerText = "The password was changed successfully!";
+  		}else if (con.status==500 || con.status==404){
+        // show an error message
+        oldPassId.setCustomValidity(JSON.parse(con.responseText).message);
+      	formData.reportValidity();
+  		}
+    }
+    con.setRequestHeader("Content-Type", "application/json");
+    //send the request with parameter
+    con.send(JSON.stringify(formLogin));
+
 	}
-	formData.reportValidity();
 	return false;
 }
 
