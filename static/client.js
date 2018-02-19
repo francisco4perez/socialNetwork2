@@ -3,17 +3,24 @@
 displayview = function(){
 	//get the token in the local storage
    var token =localStorage.getItem("loggedinuser");
-   var data =serverstub.getUserDataByToken(token);
-   // check if this token exists in our server
-   if(data.success){
-	   // if it exists, show the profile view
-	   document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-	   var idnavbar = localStorage.getItem("navbar");
-	   clicknavbutton(idnavbar);
-   }else{
-	// else show the welcome view
-	document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
-   }
+
+   var con = new XMLHttpRequest();
+
+   con.open("GET", '/getdatabytoken/'+token, true);
+
+   con.onreadystatechange = function () {
+     // check if this token exists in our server
+     if (con.readyState == 4 && con.status == 200) {
+      // if it exists, show the profile view
+      document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+      var idnavbar = localStorage.getItem("navbar");
+      clicknavbutton(idnavbar);
+     }else{
+       // else show the welcome view
+       document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
+     }
+   };
+   con.send(null);
 };
 
 // Function that validates the form
@@ -38,7 +45,7 @@ validateForm = function() {
 		}else{
 			return true;
 		}
-	    
+
 	};
 
 //Sign-up function called when the user submit the form to sign up
@@ -58,21 +65,42 @@ signup = function(){
 		// try to sign up with this contact
 		var result = serverstub.signUp(newProfile);
 
-		// show an error message 
-		if(!result.success){
-			 var email= document.getElementById("emailsignup");
-			email.setCustomValidity("This email address already exists!");
-			
-		}else{
+    var con = new XMLHttpRequest();
+    // open a put request to the server to sign up
+    con.open("PUT", '/signup', true);
 
-			// show the profile view and store the token into the local storage
-			document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-			document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
-			var signingin=serverstub.signIn(newProfile.email,newProfile.password);
-			localStorage.setItem("loggedinuser",signingin.data);
-			// display profile of the current user
-			displayprofile();
-		}
+    con.onreadystatechange = function () {
+        if (con.readyState == 4 && con.status == 200) {
+          // show the profile view and store the token into the local storage
+    			document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+    			document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
+          // open a new request to sign in
+          con.open("PUT", '/signin', true);
+          // create the JSON parameters with email and password
+          var id = {
+      				"email": newProfile.email,
+      				"password": newProfile.password,
+      		};
+          con.onreadystatechange = function () {
+            data = JSON.parse(con.responseText).data;
+            localStorage.setItem("loggedinuser",data);
+      			// display profile of the current user
+      			displayprofile();
+          }
+          con.setRequestHeader("Content-Type", "application/json");
+          //send the request
+          con.send(JSON.stringify(id));
+
+        } else {
+          	// show an error message
+          var email= document.getElementById("emailsignup");
+          email.setCustomValidity("This email address already exists!");
+        }
+    };
+
+    con.setRequestHeader("Content-Type", "application/json");
+    // send the signup request
+    con.send(JSON.stringify(newProfile));
 	}
 	formData.reportValidity();
 	return false;
@@ -83,18 +111,34 @@ signin = function(){
 		var formData = document.forms["login-form"];
 		var message = document.getElementById("message");
 		//receive the token from the server and see if the user exist
-		var result =serverstub.signIn(formData.emaillogin.value.trim(), formData.passwordlogin.value.trim());
-		if(result.success){
-			// if the user exist display his profile view and store the token in the local storage
+		var result
 
-			document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-			document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
-			localStorage.setItem("loggedinuser",result.data);
-			displayprofile();
-		}
-		// else display an error message
-		var username = document.getElementById("emaillogin");
-		username.setCustomValidity(result.message);
+    // open a new request to sign in
+    con.open("PUT", '/signin', true);
+    // create the JSON parameters with email and password
+    var logform = {
+        "email": formData.emaillogin.value.trim(),
+        "password": formData.passwordlogin.value.trim(),
+    };
+    con.onreadystatechange = function () {
+      // if the user exist display his profile view and store the token in the local storage
+      if (con.readyState == 4 && con.status == 200) {
+  			document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+  			document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
+        data = JSON.parse(con.responseText).data;
+  			localStorage.setItem("loggedinuser",data);
+        // display profile of the current user
+        displayprofile();
+      }else {
+        // else display an error message
+    		var username = document.getElementById("emaillogin");
+    		username.setCustomValidity(JSON.parse(con.responseText).message);
+      }
+    }
+    con.setRequestHeader("Content-Type", "application/json");
+    //send the request
+    con.send(JSON.stringify(logform));
+
 		formData.reportValidity();
 		return false;
 }
@@ -156,7 +200,7 @@ changePassword = function(){
 
 		// try to sign up with this contact
 		var result = serverstub.changePassword(token, old_pass, new_pass);
-		// show an error message 
+		// show an error message
 		if(!result.success){
 			oldPassId.setCustomValidity(result.message);
 		}else{
@@ -210,7 +254,7 @@ clicknavbutton = function(id){
 
 // Show the profile of a person depending on the token in parameter
 displayprofile = function(email=""){
-	
+
 	var token = localStorage.getItem("loggedinuser");
 	// Get the data of the user from the server depending on his token
 	if(email==""){
@@ -218,7 +262,7 @@ displayprofile = function(email=""){
 	}else{
 		var result= serverstub.getUserDataByEmail(token,email);
 	}
-	
+
 	if(result.success){
 		// display all the data of the user
 		document.getElementById("homeusername").innerText=result.data.firstname +" " + result.data.familyname;
@@ -229,7 +273,7 @@ displayprofile = function(email=""){
 	}
 	displaymessages();
 }
-	
+
 // methode to post a message to a wall
 postmessage = function(){
 	var message = document.getElementById("postmessage").value.trim();
@@ -256,7 +300,7 @@ displaymessages= function(){
 	document.getElementById("messages").innerHTML="";
 	var result=document.getElementById("messages");
 	for (var i=0; i<messages.data.length;i++){
-		
+
 		//show messages and change style depending if the email is the current user's email
 		if(messages.data[i].writer==currentuseremail){
 			result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
@@ -266,9 +310,9 @@ displaymessages= function(){
 		}
 		document.getElementById("postername"+i).innerText=messages.data[i].writer;
 		document.getElementById("postermessage"+i).innerText=messages.data[i].content;
-		
+
 	}
-	
+
 }
 
 // find the profile with the username given by the input
@@ -282,7 +326,7 @@ searchprofile = function(){
 		document.getElementById("home").style.display = "block";
 		document.getElementById("messageusername").innerText="";
 	}else{
-		
+
 		var message =serverstub.getUserMessagesByEmail(token,email).message;
 		var emailId=document.getElementById("search");
 		emailId.setCustomValidity(message);
@@ -294,8 +338,7 @@ searchprofile = function(){
 
 // Main function- Called when the page is loading
 window.onload = function(){
-	
-	displayview();
-	
-}
 
+	displayview();
+
+}
