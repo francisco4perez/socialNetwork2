@@ -62,8 +62,6 @@ signup = function(){
 				"city": formData.city.value.trim(),
 				"country": formData.country.value.trim()
 		};
-		// try to sign up with this contact
-		var result = serverstub.signUp(newProfile);
 
     var con = new XMLHttpRequest();
     // open a put request to the server to sign up
@@ -356,8 +354,10 @@ displaymessages= function(){
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
 		if(con.readyState == 4 && con.status == 200){
+			// get messages of the profile showed
+			messages= JSON.parse(con.responseText).data.messages
 			var con2 = new XMLHttpRequest();
-			con2.open("GET", '/getmessagesbytoken/'+token, true);
+			con2.open("GET", '/getdatabytoken/'+token, true);
 	
 			// when the response is back, execute this function
 			con2.onreadystatechange = function () {
@@ -365,7 +365,7 @@ displaymessages= function(){
 			if(con2.readyState == 4 && con2.status == 200){
 				
 				// get the email of the current user with his token
-				var currentuseremail = serverstub.getUserDataByToken(token).data.email;
+				var currentuseremail = JSON.parse(con2.responseText).data.email;
 				document.getElementById("messages").innerHTML="";
 				var result=document.getElementById("messages");
 				
@@ -397,7 +397,6 @@ displaymessages= function(){
 searchprofile = function(){
 	var email = document.getElementById("search").value.trim();
 	var token = localStorage.getItem("loggedinuser");
-	var result=serverstub.getUserMessagesByEmail(token,email);
 	
 	var con = new XMLHttpRequest();
 	// open a new request to get messages of a profile according to his email
