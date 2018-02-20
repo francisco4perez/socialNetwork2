@@ -291,32 +291,31 @@ clicknavbutton = function(id){
 displayprofile = function(email=""){
 
 	var token = localStorage.getItem("loggedinuser");
-  var con = new XMLHttpRequest();
+	var con = new XMLHttpRequest();
 	// Get the data of the user from the server depending on his token
 	if(email==""){
-    // open a new request to get user data by token
-    con.open("GET", '/getdatabytoken/'+token, true);
+		// open a new request to get user data by token
+		con.open("GET", '/getdatabytoken/'+token, true);
 	}else{
-      // open a new request to get user data by email
-    con.open("GET", '/getdatabyemail/'+token +'/'+email, true);
+		  // open a new request to get user data by email
+		con.open("GET", '/getdatabyemail/'+token +'/'+email, true);
 	}
 
   // when the response is back, execute this function
-  con.onreadystatechange = function () {
+	con.onreadystatechange = function () {
 
-    if(con.readyState == 4 &&con.status == 200){
-      result= JSON.parse(con.responseText);
-      // display all the data of the user
+	if(con.readyState == 4 &&con.status == 200){
+		result= JSON.parse(con.responseText);
+		// display all the data of the user
   		document.getElementById("homeusername").innerText=result.data.firstname +" " + result.data.familyname;
   		document.getElementById("homegender").innerText=result.data.gender;
   		document.getElementById("homeemail").innerText=result.data.email;
   		document.getElementById("homecity").innerText=result.data.city;
   		document.getElementById("homecountry").innerText=result.data.country;
-    }
-  }
-  con.setRequestHeader("Content-Type", "application/json");
-  //send the request with parameter
-  con.send(null);
+	}
+	con.setRequestHeader("Content-Type", "application/json");
+	//send the request with parameter
+	con.send(null);
 	displaymessages();
 }
 
@@ -327,7 +326,19 @@ postmessage = function(){
 	if(message!=""){
 		var token = localStorage.getItem("loggedinuser");
 		var email = document.getElementById("homeemail").innerText;
-		serverstub.postMessage(token, message, email);
+		
+		var con = new XMLHttpRequest();
+		// open a new request to poste a message
+		con.open("POST", '/postmessage', true);
+		// create the JSON parameters with token of th current user, the email of the profile and the message posted
+		var messageJson = {
+			"token": token,
+			"email": email,
+			"message": message
+		};
+		con.setRequestHeader("Content-Type", "application/json");
+		//send the request with parameter
+		con.send(JSON.stringify(messageJson));
 		document.getElementById("postmessage").value="";
 	}
 	return false;
@@ -336,29 +347,50 @@ postmessage = function(){
 /*display messages of all the current profile -- also called to refresh a page*/
 displaymessages= function(){
 	var email = document.getElementById("homeemail").innerText;
-  	// get the token of the current user
+	// get the token of the current user
 	var token = localStorage.getItem("loggedinuser");
-	var messages = serverstub.getUserMessagesByEmail(token,email);
+	var con = new XMLHttpRequest();
+	// open a new request to get messages of a profile according to his email
+	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
+	
+	// when the response is back, execute this function
+	con.onreadystatechange = function () {
+		if(con.readyState == 4 && con.status == 200){
+			var con2 = new XMLHttpRequest();
+			con2.open("GET", '/getmessagesbytoken/'+token, true);
+	
+			// when the response is back, execute this function
+			con2.onreadystatechange = function () {
 
-
-// get the email of the current user with his token
-	var currentuseremail = serverstub.getUserDataByToken(token).data.email;
-	document.getElementById("messages").innerHTML="";
-	var result=document.getElementById("messages");
-	for (var i=0; i<messages.data.length;i++){
-
-		//show messages and change style depending if the email is the current user's email
-		if(messages.data[i].writer==currentuseremail){
-			result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
+			if(con2.readyState == 4 && con2.status == 200){
+				
+				// get the email of the current user with his token
+				var currentuseremail = serverstub.getUserDataByToken(token).data.email;
+				document.getElementById("messages").innerHTML="";
+				var result=document.getElementById("messages");
+				
+				for (var i=0; i<messages.data.length;i++){
+					//show messages and change style depending if the email is the current user's email
+					if(messages.data[i].writer==currentuseremail){
+						result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
+					}
+					else{
+						result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div>";
+					}
+					document.getElementById("postername"+i).innerText=messages.data[i].writer;
+					document.getElementById("postermessage"+i).innerText=messages.data[i].content;
+				}
+			}
 		}
-		else{
-			result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div>";
+		con2.setRequestHeader("Content-Type", "application/json");
+		//send the request
+		con2.send(null);
 		}
-		document.getElementById("postername"+i).innerText=messages.data[i].writer;
-		document.getElementById("postermessage"+i).innerText=messages.data[i].content;
-
 	}
-
+	con.setRequestHeader("Content-Type", "application/json");
+	//send the request
+	con.send(null);
+	
 }
 
 // find the profile with the username given by the input
@@ -366,25 +398,37 @@ searchprofile = function(){
 	var email = document.getElementById("search").value.trim();
 	var token = localStorage.getItem("loggedinuser");
 	var result=serverstub.getUserMessagesByEmail(token,email);
-	if(result.success){// if the user exists
-		//show profile
-		displayprofile(email);
-		document.getElementById("home").style.display = "block";
-		document.getElementById("messageusername").innerText="";
-	}else{
-
-		var message =serverstub.getUserMessagesByEmail(token,email).message;
-		var emailId=document.getElementById("search");
-		emailId.setCustomValidity(message);
-		emailId.reportValidity();
-		document.getElementById("home").style.display = "none";
+	
+	var con = new XMLHttpRequest();
+	// open a new request to get messages of a profile according to his email
+	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
+	
+	// when the response is back, execute this function
+	con.onreadystatechange = function () {
+		// if it succeed(the user exist)
+		if(con.readyState == 4 && con.status == 200){
+			//show profile
+			displayprofile(email);
+			document.getElementById("home").style.display = "block";
+			document.getElementById("messageusername").innerText="";
+		}else if(con.status==401|| con.status==404){
+			//show the error message send by the server
+			var message =JSON.parse(con.responseText).message;
+			var emailId=document.getElementById("search");
+			emailId.setCustomValidity(message);
+			emailId.reportValidity();
+			document.getElementById("home").style.display = "none";
+		}
 	}
+	con.setRequestHeader("Content-Type", "application/json");
+	//send the request
+	con.send(null);
 }
 
 
 // Main function- Called when the page is loading
 window.onload = function(){
-
+	
 	displayview();
 
 }
