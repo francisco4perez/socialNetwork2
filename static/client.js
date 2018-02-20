@@ -14,6 +14,9 @@ displayview = function(){
       // if it exists, show the profile view
       document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
       var idnavbar = localStorage.getItem("navbar");
+      if(idnavbar==null){
+        idnavbar="homenav";
+      }
       clicknavbutton(idnavbar);
      }else{
        // else show the welcome view
@@ -303,7 +306,8 @@ displayprofile = function(email=""){
 	con.onreadystatechange = function () {
 
 	if(con.readyState == 4 &&con.status == 200){
-		result= JSON.parse(con.responseText);
+    var resultText =con.responseText;
+		result= JSON.parse(resultText);
 		// display all the data of the user
   		document.getElementById("homeusername").innerText=result.data.firstname +" " + result.data.familyname;
   		document.getElementById("homegender").innerText=result.data.gender;
@@ -350,7 +354,7 @@ displaymessages= function(){
 	var token = localStorage.getItem("loggedinuser");
 	var con = new XMLHttpRequest();
 	// open a new request to get messages of a profile according to his email
-	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
+	con.open("GET", '/getusermessagesbyemail/'+token+'/'+email, true);
 
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
@@ -401,7 +405,7 @@ searchprofile = function(){
 
 	var con = new XMLHttpRequest();
 	// open a new request to get messages of a profile according to his email
-	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
+	con.open("GET", '/getusermessagesbyemail/'+token+'/'+email, true);
 
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {

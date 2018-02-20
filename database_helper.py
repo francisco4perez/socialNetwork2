@@ -80,9 +80,11 @@ def get_user_by_token(token):
     cursor = g.db.execute("select * from users where token = ?",[token])
     rows = cursor.fetchall()
     cursor.close()
-    for index in range(len(rows)):
-        result.append({'email':rows[index][0], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
-    return result
+    if rows ==[]:
+        return None
+    d = {}
+    d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
+    return d
 
 #get all information about a user depending of his email
 def get_user_by_email(email):
@@ -91,9 +93,12 @@ def get_user_by_email(email):
     cursor = g.db.execute("select * from users where email = ?", [email])
     rows = cursor.fetchall()
     cursor.close()
-    for index in range(len(rows)):
-        result.append({'email':rows[index][0], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
-    return result
+    d = {}
+    if rows:
+        d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
+    #for index in range(len(rows)):
+        #result.append({'email':rows[index][0], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
+    return d
 
 #get all information about a user depending of his email and password
 def get_user_by_email_and_password(email,password):
@@ -102,9 +107,9 @@ def get_user_by_email_and_password(email,password):
     cursor = g.db.execute("select * from users where email = ? and password = ?", [email,password])
     rows = cursor.fetchall()
     cursor.close()
-    for index in range(len(rows)):
-        result.append({'email':rows[index][0],'password':rows[index][1], 'firstname':rows[index][3],'familyname':rows[index][4],'gender':rows[index][5],'city':rows[index][6],'country':rows[index][7]})
-    return result
+    d = {}
+    d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
+    return d
 
 #get all messages of a profile given his email
 def get_messages(email):

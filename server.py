@@ -24,15 +24,6 @@ def teardown_request(exception):
 def main():
     return app.send_static_file('client.html')
 
-@app.route('/api')
-def api():
-    if request.environ.get('wsgi.websocket'):
-        ws = request.environ['wsgi.websocket']
-        while True:
-            message = ws.wait()
-            ws.send(message)
-    return
-
 #return true if the email and password in parameter correspond to a profile in the database
 def verify_password(email, password):
     result = database_helper.get_user_by_email_and_password(email,password)
@@ -52,23 +43,13 @@ def sign_in():
     password = request.get_json()['password']
     # verify that the user exists
     if verify_password(email,password):
-
-        # verify if the token exists in the user
-        token = database_helper.get_token_by_email(email)
-
-        if token:
-            if database_helper.delete_token(token):
-                return '{"success": true, "message": "You have to logout!."}', 444
-            else:
-                return '{"success": false, "message": "Something went wrong"}',500
-
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        token = ""
         for i in range(36) :
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
         result = database_helper.update_token(token,email)
-
         if result :
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
@@ -80,6 +61,7 @@ def sign_in():
 @app.route('/signup',methods=['PUT'])
 def sign_up():
     try:
+        print "hello"
         # get all parameters
         email = request.get_json()['email']
         password = request.get_json()['password']
@@ -91,6 +73,7 @@ def sign_up():
 
         # test if the values are not empty and if the password is at least 6 caracters long
         if len(email)!=0 and len(password) >= 6 and len(firstname)!=0 and len(familyname)!=0 and len(gender)!=0 and len(city)!=0 and len(country)!=0 :
+            print email
             exist = database_helper.get_user_by_email(email)
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
@@ -128,7 +111,7 @@ def get_user_data_by_token(token):
         if len(result) == 0:
             return '{"success": false, "message": "No such user."}', 404
         else:
-            return '{"success": true, "message": "User data retrieved.", "data":' + str(result[0])+'}', 200
+            return '{"success": true, "message": "User data retrieved.", "data": ' + json.dumps(result) +'}',200
     else:
         return '{"success": false, "message": "You are not signed in."}', 401
 
@@ -144,7 +127,7 @@ def get_user_data_by_email(token,email):
             if len(result) == 0:
                 return '{"success": false, "message": "No such user."}', 404
             else:
-                return '{"success": true, "message": "User data retrieved.", "data":{}' + json.dumps(result[0]) +'}}',200
+                return '{"success": true, "message": "User data retrieved.", "data": ' + json.dumps(result) +'}',200
         else :
             return '{"success": false, "message": "You are not signed in."}', 401
     else:
@@ -171,7 +154,7 @@ def get_user_messages_by_email(token,email):
         if exist:
             #search messages in the database with th given email
             result = database_helper.get_messages(email)
-            return '{"success": true, "message": "User messages retrieved.", "data":"' + str(result) +'"}',200
+            return '{"success": true, "message": "User messages retrieved.", "data":"' + json.dumps(result) +'"}',200
         else :
             return '{"success": false, "message": "You are not signed in."}', 401
     else:
