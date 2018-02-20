@@ -378,13 +378,13 @@ displaymessages= function(){
 
           for (var i=0; i<messages.length;i++){
             //show messages and change style depending if the email is the current user's email
-            if(messages[i].writer==currentuseremail){
+            if(messages[i].writer_id==currentuseremail){
               result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
             }
             else{
               result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div>";
             }
-            document.getElementById("postername"+i).innerText=messages[i].writer;
+            document.getElementById("postername"+i).innerText=messages[i].writer_id;
             document.getElementById("postermessage"+i).innerText=messages[i].content;
           }
         }
