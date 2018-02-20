@@ -154,7 +154,7 @@ def get_user_messages_by_email(token,email):
         if exist:
             #search messages in the database with th given email
             result = database_helper.get_messages(email)
-            return '{"success": true, "message": "User messages retrieved.", "data":"' + json.dumps(result) +'"}',200
+            return '{"success": true, "message": "User messages retrieved.", "data":' + json.dumps(result) +'}',200
         else :
             return '{"success": false, "message": "You are not signed in."}', 401
     else:
@@ -173,7 +173,7 @@ def post_message():
         if existtoken:
             if existemail :
                 #get the name of the writer
-                writer = existtoken[0]['email']
+                writer = existtoken['email']
                 result = database_helper.insert_message(email,writer,message)
                 if result :
                     return '{"success": true, "message": "the message has been posted"}', 200
