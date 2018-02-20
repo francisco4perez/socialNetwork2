@@ -311,11 +311,12 @@ displayprofile = function(email=""){
   		document.getElementById("homecity").innerText=result.data.city;
   		document.getElementById("homecountry").innerText=result.data.country;
 	}
-	con.setRequestHeader("Content-Type", "application/json");
-	//send the request with parameter
-	con.send(null);
-	displaymessages();
-}
+    }
+    con.setRequestHeader("Content-Type", "application/json");
+    //send the request with parameter
+    con.send(null);
+     displaymessages();
+  }
 
 // methode to post a message to a wall
 postmessage = function(){
@@ -324,7 +325,7 @@ postmessage = function(){
 	if(message!=""){
 		var token = localStorage.getItem("loggedinuser");
 		var email = document.getElementById("homeemail").innerText;
-		
+
 		var con = new XMLHttpRequest();
 		// open a new request to poste a message
 		con.open("POST", '/postmessage', true);
@@ -350,7 +351,7 @@ displaymessages= function(){
 	var con = new XMLHttpRequest();
 	// open a new request to get messages of a profile according to his email
 	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
-	
+
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
 		if(con.readyState == 4 && con.status == 200){
@@ -358,17 +359,17 @@ displaymessages= function(){
 			messages= JSON.parse(con.responseText).data.messages
 			var con2 = new XMLHttpRequest();
 			con2.open("GET", '/getdatabytoken/'+token, true);
-	
+
 			// when the response is back, execute this function
 			con2.onreadystatechange = function () {
 
 			if(con2.readyState == 4 && con2.status == 200){
-				
+
 				// get the email of the current user with his token
 				var currentuseremail = JSON.parse(con2.responseText).data.email;
 				document.getElementById("messages").innerHTML="";
 				var result=document.getElementById("messages");
-				
+
 				for (var i=0; i<messages.data.length;i++){
 					//show messages and change style depending if the email is the current user's email
 					if(messages.data[i].writer==currentuseremail){
@@ -390,18 +391,18 @@ displaymessages= function(){
 	con.setRequestHeader("Content-Type", "application/json");
 	//send the request
 	con.send(null);
-	
+
 }
 
 // find the profile with the username given by the input
 searchprofile = function(){
 	var email = document.getElementById("search").value.trim();
 	var token = localStorage.getItem("loggedinuser");
-	
+
 	var con = new XMLHttpRequest();
 	// open a new request to get messages of a profile according to his email
 	con.open("GET", '/getmessagesbyemail/'+token+'/'+email, true);
-	
+
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
 		// if it succeed(the user exist)
@@ -427,7 +428,7 @@ searchprofile = function(){
 
 // Main function- Called when the page is loading
 window.onload = function(){
-	
+
 	displayview();
 
 }
