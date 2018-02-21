@@ -140,7 +140,7 @@ signin = function(){
     }
     if (con.status==444){
       var token =localStorage.getItem("loggedinuser");
-      if(token != None){
+      if(token != ""){
         signout();
       }
     }

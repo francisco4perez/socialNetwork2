@@ -43,9 +43,16 @@ def sign_in():
     password = request.get_json()['password']
     # verify that the user exists
     if verify_password(email,password):
+
+
+        token = ""
+        token = database_helper.get_token_by_email(email)
+
+        if token:
+            return '{"success": true, "message": "You have to logout!", "data":"'+str(token)+'"}', 444
+
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-        token = ""
         for i in range(36) :
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
@@ -54,6 +61,8 @@ def sign_in():
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
             return '{"success": false, "message": "Wrong username or password."}', 501
+
+        
     else:
         return '{"success": false, "message": "Wrong username or password."}', 501
 
