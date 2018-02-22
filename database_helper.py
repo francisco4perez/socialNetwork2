@@ -107,6 +107,8 @@ def get_user_by_email_and_password(email,password):
     cursor = g.db.execute("select * from users where email = ? and password = ?", [email,password])
     rows = cursor.fetchall()
     cursor.close()
+    if not rows:
+        return None
     d = {}
     d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
     return d

@@ -4,26 +4,33 @@ displayview = function(){
   //get the token in the local storage
   var token =localStorage.getItem("loggedinuser");
 
-  var con = new XMLHttpRequest();
+  if(token != null){
 
-  con.open("GET", '/getdatabytoken/'+token, true);
+  	var con = new XMLHttpRequest();
 
-  con.onreadystatechange = function () {
-    // check if this token exists in our server
-    if (con.readyState == 4 && con.status == 200) {
-      // if it exists, show the profile view
-      document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-      var idnavbar = localStorage.getItem("navbar");
-      if(idnavbar==null){
-        idnavbar="homenav";
-      }
-      clicknavbutton(idnavbar);
-    }else{
-      // else show the welcome view
-      document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
-    }
-  };
-  con.send(null);
+	con.open("GET", '/getdatabytoken/'+token, true);
+
+	con.onreadystatechange = function () {
+	// check if this token exists in our server
+	if (con.readyState == 4 && con.status == 200) {
+	  // if it exists, show the profile view
+	  document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+	  var idnavbar = localStorage.getItem("navbar");
+	  if(idnavbar==null){
+	    idnavbar="homenav";
+	  }
+	  clicknavbutton(idnavbar);
+	}else{
+	  // else show the welcome view
+	  document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
+	}
+	};
+	con.send(null);
+  }else{
+  	 // else show the welcome view
+	  document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
+  }
+  
 };
 
 // Function that validates the form
@@ -112,15 +119,20 @@ signin = function(){
   var formData = document.forms["login-form"];
   var message = document.getElementById("message");
   //receive the token from the server and see if the user exist
-  var result
-
+  var result;
+  //socket();
   var con = new XMLHttpRequest();
   // open a new request to sign in
   con.open("PUT", '/signin', true);
+
+  var email = formData.emaillogin.value.trim();
+  var password = formData.passwordlogin.value.trim();
+
+
   // create the JSON parameters with email and password
   var logform = {
-    "email": formData.emaillogin.value.trim(),
-    "password": formData.passwordlogin.value.trim(),
+    "email": email,
+    "password": password,
   };
   con.onreadystatechange = function () {
     // if the user exist display his profile view and store the token in the local storage
@@ -132,17 +144,13 @@ signin = function(){
       localStorage.setItem("loggedinuser",data);
       // display profile of the current user
       displayprofile();
+      socket(email);
+
     }else  if (con.status==501){
       // else display an error message
       var username = document.getElementById("emaillogin");
       username.setCustomValidity(JSON.parse(con.responseText).message);
       formData.reportValidity();
-    }
-    if (con.status==444){
-      var token =localStorage.getItem("loggedinuser");
-      if(token != ""){
-        signout();
-      }
     }
 
   }
@@ -161,26 +169,31 @@ clearcustomvalidity = function(field){
 //Sign-out function called when the user wants to signout from the system
 signout = function(){
   var token =localStorage.getItem("loggedinuser");
-  var con = new XMLHttpRequest();
-  // open a new request to sign in
-  con.open("PUT", '/signout', true);
-  // create the JSON parameters with email and password
-  var tokenJson = {
-    "token": token
-  };
-  // when the response is back, execute this function
-  con.onreadystatechange = function () {
-    // remove the token from the local storage
-    localStorage.removeItem("loggedinuser");
-    document.getElementById("navcontainer").innerHTML= "";
-    document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
 
-    // set homenav by default in the navbar
-    localStorage.setItem('navbar',"homenav");
+  if(token != null){
+  	var con = new XMLHttpRequest();
+	// open a new request to sign in
+	con.open("PUT", '/signout', true);
+	// create the JSON parameters with email and password
+	var tokenJson = {
+	"token": token
+	};
+	// when the response is back, execute this function
+	con.onreadystatechange = function () {
+	// remove the token from the local storage
+	localStorage.removeItem("loggedinuser");
+	document.getElementById("navcontainer").innerHTML= "";
+	document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
+
+	//websocket.close();
+	// set homenav by default in the navbar
+	localStorage.setItem('navbar',"homenav");
+	}
+	con.setRequestHeader("Content-Type", "application/json");
+	//send the request with parameter
+	con.send(JSON.stringify(tokenJson));
   }
-  con.setRequestHeader("Content-Type", "application/json");
-  //send the request with parameter
-  con.send(JSON.stringify(tokenJson));
+  
 }
 
 //Function to validate the forms in account view
@@ -431,10 +444,39 @@ searchprofile = function(){
   con.send(null);
 }
 
+function onMessage(evt)
+  {
+    var message = evt.data;
+    
+    if (message == "signout"){
+    	signout();
+    	//websocket.close();
+    }
+    
+  }
+
+function socket(email)
+  {
+  	url = "ws://localhost:5000/websocket";
+    websocket = new WebSocket(url);
+
+    websocket.onopen = function(event){
+
+      	websocket.send(email);
+
+    };
+
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
 
 // Main function- Called when the page is loading
 window.onload = function(){
 
+
   displayview();
+  //socket();
+  //window.addEventListener("signout", socket, false);
 
 }

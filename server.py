@@ -1,6 +1,6 @@
 from gevent.wsgi import WSGIServer
-from flask import app, request
-from flask import Flask
+from geventwebsocket.handler import WebSocketHandler
+from flask import Flask, app, request 
 import database_helper
 import json
 import random
@@ -8,6 +8,7 @@ import random
 app = Flask(__name__)
 app.debug = True
 
+email_socket_dict = {}
 
 #Connect database before request
 @app.before_request
@@ -35,6 +36,28 @@ def verify_password(email, password):
     except:
         return False
 
+@app.route('/websocket')
+def web_socket():
+
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        there_is_email = False
+        while True:
+            email = ws.receive()
+
+            for key in email_socket_dict.keys():
+                if key == email:
+                    there_is_email = True
+
+            if there_is_email:
+                websocket = email_socket_dict[email]
+                websocket.send("signout")
+
+            email_socket_dict[email] = ws
+
+
+
+
 #method that return true if the user with the password and email in parameters exists
 @app.route('/signin', methods=['PUT'])
 def sign_in():
@@ -44,12 +67,11 @@ def sign_in():
     # verify that the user exists
     if verify_password(email,password):
 
-
         token = ""
-        token = database_helper.get_token_by_email(email)
+        #token = database_helper.get_token_by_email(email)
 
-        if token:
-            return '{"success": true, "message": "You have to logout!", "data":"'+str(token)+'"}', 444
+        #if token:
+        #    websocket()
 
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -99,7 +121,7 @@ def sign_out():
     token = request.get_json()['token']
     result = database_helper.get_user_by_token(token)
 
-    if len(result) == 0:
+    if not result:
         return '{"success": false, "message": "No such token"}',400
 
     if token != None:
@@ -232,5 +254,5 @@ def changePassword_data(token):
 
 if __name__ == '__main__':
 
-    http_server = WSGIServer(('', 5000), app)
+    http_server = WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
