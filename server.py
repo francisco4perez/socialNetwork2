@@ -109,7 +109,7 @@ def sign_up():
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
                 #hash of the password with salt
-                salt = uuid.uuid4().hex
+                salt = uuid.uuid4().hex  
                 hashed_password = hashlib.sha512(password + salt).hexdigest()
                 database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country,salt)
                 return '{"success": true, "message": "Successfully created a new user."}', 200
