@@ -4,6 +4,7 @@ from flask import Flask
 import database_helper
 import json
 import random
+import hashlib
 
 app = Flask(__name__)
 app.debug = True
@@ -62,7 +63,7 @@ def sign_in():
         else :
             return '{"success": false, "message": "Wrong username or password."}', 501
 
-        
+
     else:
         return '{"success": false, "message": "Wrong username or password."}', 501
 
@@ -85,7 +86,10 @@ def sign_up():
             exist = database_helper.get_user_by_email(email)
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
-                database_helper.insert_user(email,password,"",firstname,familyname,gender,city,country)
+                #hash of the password with salt
+                salt = uuid.uuid4().hex
+                hashed_password = hashlib.sha512(password + salt).hexdigest()
+                database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country)
                 return '{"success": true, "message": "Successfully created a new user."}', 200
             else:
                 return '{"success": false, "message": "User already exists."}', 409

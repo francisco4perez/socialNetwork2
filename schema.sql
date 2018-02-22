@@ -7,6 +7,7 @@ create table users(
     gender text,
     city text,
     country text,
+    salt text,
     primary key(email)
 );
 create table messages(
