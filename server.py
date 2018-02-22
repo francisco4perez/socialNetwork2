@@ -1,6 +1,6 @@
 from gevent.wsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-from flask import Flask, app, request 
+from flask import Flask, app, request
 import database_helper
 import json
 import random
@@ -111,7 +111,7 @@ def sign_up():
                 #hash of the password with salt
                 salt = uuid.uuid4().hex
                 hashed_password = hashlib.sha512(password + salt).hexdigest()
-                database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country)
+                database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country,salt)
                 return '{"success": true, "message": "Successfully created a new user."}', 200
             else:
                 return '{"success": false, "message": "User already exists."}', 409
