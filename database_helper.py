@@ -113,6 +113,19 @@ def get_user_by_email_and_password(email,password):
     d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
     return d
 
+#get the salt of a given password
+def get_salt_by_email(email):
+    result=[]
+    # prepare statement to get the salt depending of the email
+    cursor = g.db.execute("select salt from users where email = ?", [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    if not rows:
+        return None
+    d = {}
+    d["salt"]= rows[0][0]
+    return d
+
 #get all messages of a profile given his email
 def get_messages(email):
     result = []

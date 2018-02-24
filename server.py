@@ -5,6 +5,7 @@ import database_helper
 import json
 import random
 import hashlib
+import uuid
 
 app = Flask(__name__)
 app.debug = True
@@ -28,9 +29,13 @@ def main():
 
 #return true if the email and password in parameter correspond to a profile in the database
 def verify_password(email, password):
-    result = database_helper.get_user_by_email_and_password(email,password)
+    salt = database_helper.get_salt_by_email(email)
+    if not salt:
+        return False
+    hashed_password = hashlib.sha512(password + salt["salt"]).hexdigest()
+    result = database_helper.get_user_by_email_and_password(email,hashed_password)
     try :
-        if result and len(password)>=6:
+        if result:
             return True
         else :
             return False
@@ -69,11 +74,6 @@ def sign_in():
     if verify_password(email,password):
 
         token = ""
-        #token = database_helper.get_token_by_email(email)
-
-        #if token:
-        #    websocket()
-
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
         for i in range(36) :
@@ -109,7 +109,7 @@ def sign_up():
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
                 #hash of the password with salt
-                salt = uuid.uuid4().hex  
+                salt = uuid.uuid4().hex
                 hashed_password = hashlib.sha512(password + salt).hexdigest()
                 database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country,salt)
                 return '{"success": true, "message": "Successfully created a new user."}', 200
@@ -239,9 +239,9 @@ def changePassword_data(token):
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
 
-        #to verify if the oldpassword is right and has more lenght than six letters
+        #to  if the oldpassword is right and has more lenght than six letters
         if verify_password(user["email"],oldPass):
-            if len(oldPass) >= 6:
+            if len(newPass) >= 6:
                 #if changing is succesfull
                 if database_helper.update_password(token,oldPass,newPass):
                     return '{"success": true, "message": "Password changed"}',200
