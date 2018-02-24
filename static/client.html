@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
     <head>
 		<title>Twidder</title>
     	<meta charset="utf-8"/>
        <link href="static/client.css" type="text/css" rel="stylesheet">
        <script src="static/serverstub.js" type="text/javascript"></script>
        <script src="static/client.js" type="text/javascript"></script>
-       
+
        <!-- Welcome View -->
 		<script id="welcomeview" type="text/view">
 			<div class="container">
 			<!-- logo and slogan -->
 				<div id="left-side">
-					<img src="static/wimage.png" alt="logoImage">
+					<img src="static/images/wimage.png" alt="logoImage">
 				</div>
 				<div id="right-side">
 					<!-- Login -->
@@ -53,7 +53,7 @@
 					</div>
 				</div>
 			</div>
-	
+
 		</script>
 
 		<!-- Navbar View -->
@@ -64,32 +64,32 @@
 			  <li><a id="accountnav" href="" onclick="return clicknavbutton(this.id)">Account</a></li>
 			</ul>
 		</script>
-	
+
 		<!-- Profile View -->
 		<script id="profileview" type="text/view">
 
-			
+
 			<!-- search bar to find other profile-->
 			<div id="browse">
-			
+
 				<input type="text" class="inputprofile" id="search" name="searchbar" placeholder="Search for an address here" oninput="return clearcustomvalidity(this)" >
-				<img id="searchicon" src="static/searchicon.png" alt="searchicon" onclick="searchprofile()" ></img>
+				<img id="searchicon" src="static/images/searchicon.png" alt="searchicon" onclick="searchprofile()" ></img>
 				<div id="messageusername" ></div>
 			</div>
-			
+
 			<!-- homeView with profile and wall-->
 			<div id="home">
 				<div id="profile">
-					<div ><img id="profilepicture" src="static/profilePicture.png" alt="profileImage"></div>
+					<div ><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
 					<div id="homeusername" ></div>
 					<div id="homegender" ></div>
 					<div id="homecity" ></div>
 					<div id="homecountry" ></div>
-					
+
 					<div id="homeemail"></div>
 				</div>
 				<div id="wall">
-				
+
 					<input type="text" class="inputprofile" id="postmessage" name="postmessage" placeholder="Post a message to the wall here">
 					<button class="basicbutton" onclick="postmessage()" >Post message</button>
 					<button class="basicbutton" id="refreshbutton" onclick="displaymessages()">Refresh</button>
@@ -102,18 +102,18 @@
 
 		<!-- Account View -->
 		<script id="accountview" type="text/view">
-		
+
 			<div id="account">
 				<div class="container">
 					<div id="changepass">
 						<h2 id="title"> You can change your password here!</h2>
-						<form id="changepass-form" name="changepass-form" method="PUT" action="#" onsubmit="return changePassword()"> 
+						<form id="changepass-form" name="changepass-form" method="PUT" action="#" onsubmit="return changePassword()">
 							<div class="inner add_top_margin">
 								<div class="row"><label class="form_input_text label_pass" for="email" >Old Pass* </label><input class="welcomeinput" type="password" id="oldpass" oninput="return clearcustomvalidity(this)" required></div>
 								<div class="row"><label class="form_input_text label_pass" for="password" >New Pass* </label><input class="welcomeinput" type="password" id="newpass" oninput="return clearcustomvalidity(this)" required></div>
 								<div class="row"><label class="form_input_text label_pass" for="password" >Repeat New Pass* </label><input class="welcomeinput" type="password" id="repeatnewpass" oninput="return clearcustomvalidity(this)" required></div>
 								<!-- submit button for changepass-->
-								
+
 								<div class="center">
 									<button class="basicbutton add_top_margin" id="changepassbutton" type="submit">Change Password</button>
 
@@ -127,7 +127,7 @@
 						</form>
 					</div>
 				</div>
-				
+
 			</div>
 		</script>
 
@@ -137,9 +137,9 @@
     <body>
     	<div id="navcontainer">
 		</div>
-		
+
 		<div id="maincontainer">
 		</div>
     </body>
-    
+
 </html>
