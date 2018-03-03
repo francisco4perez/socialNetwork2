@@ -189,7 +189,7 @@ def get_user_messages_by_email(token,email):
     if email != None :
         exist = database_helper.get_user_by_token(token)
         if exist:
-            #search messages in the database with th given email
+            #search messages in the database with the given email
             result = database_helper.get_messages(email)
             return '{"success": true, "message": "User messages retrieved.", "data":' + json.dumps(result) +'}',200
         else :
@@ -222,6 +222,20 @@ def post_message():
             return '{"success": false, "message": "You are not signed in."}', 401
     except:
         return '{"success": false, "message": "Something went wrong"}',500
+
+@app.route('/deletemessage/<token>/<id>',methods=['DELETE'])
+def delete_message(token,id):
+    if token != None :
+        existtoken = database_helper.get_user_by_token(token)
+        #if this token doesn't exist in the database, return error status
+        if not existtoken:
+            return '{"success": false, "message": "You are not signed in."}', 401
+        result = database_helper.delete_message(id)
+        if not result:
+            return '{"success": false, "message": "An error occured when trying to find this message"}', 500
+        return '{"success": true, "message": "message deleted with success"}',200
+    else:
+        return '{"success": false, "message": "You are not signed in."}', 401
 
 #Function to change password by given token
 @app.route('/changepassword/<token>', methods=['POST'])
