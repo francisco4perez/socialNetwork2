@@ -30,7 +30,7 @@ displayview = function(){
   	 // else show the welcome view
 	  document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
   }
-  
+
 };
 
 // Function that validates the form
@@ -193,7 +193,7 @@ signout = function(){
 	//send the request with parameter
 	con.send(JSON.stringify(tokenJson));
   }
-  
+
 }
 
 //Function to validate the forms in account view
@@ -392,10 +392,10 @@ displaymessages= function(){
           for (var i=0; i<messages.length;i++){
             //show messages and change style depending if the email is the current user's email
             if(messages[i].writer_id==currentuseremail){
-              result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
+              result.innerHTML+="<div id='drag' draggable='true' ondragstart='drag(event)'><div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
             }
             else{
-              result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div>";
+              result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div></div>";
             }
             document.getElementById("postername"+i).innerText=messages[i].writer_id;
             document.getElementById("postermessage"+i).innerText=messages[i].content;
@@ -447,12 +447,12 @@ searchprofile = function(){
 function onMessage(evt)
   {
     var message = evt.data;
-    
+
     if (message == "signout"){
     	signout();
     	//websocket.close();
     }
-    
+
   }
 
 function socket(email)
@@ -470,6 +470,22 @@ function socket(email)
     websocket.onerror = function(evt) { onError(evt) };
   }
 
+// function called when one of the message is dragged to put it in the trash
+function drag(ev)
+{
+   ev.dataTransfer.setData("message", ev.target.id);
+}
+// allow to drop something on the trash
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+// action when the message is drop on the trash, send a delete message to the server
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("message");
+    ev.target.appendChild(document.getElementById(data));
+}
 
 // Main function- Called when the page is loading
 window.onload = function(){

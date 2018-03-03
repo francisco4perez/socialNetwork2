@@ -4,7 +4,6 @@
 		<title>Twidder</title>
     	<meta charset="utf-8"/>
        <link href="static/client.css" type="text/css" rel="stylesheet">
-       <script src="static/serverstub.js" type="text/javascript"></script>
        <script src="static/client.js" type="text/javascript"></script>
 
        <!-- Welcome View -->
@@ -93,9 +92,9 @@
 					<input type="text" class="inputprofile" id="postmessage" name="postmessage" placeholder="Post a message to the wall here">
 					<button class="basicbutton" onclick="postmessage()" >Post message</button>
 					<button class="basicbutton" id="refreshbutton" onclick="displaymessages()">Refresh</button>
-
 					<div id="messages">
 					</div>
+          <img id="trash" src="static/images/rubbish-bin.png" alt="trash" ondrop="drop(event)" ondragover="allowDrop(event)">
 				</div>
 			</div>
 		</script>

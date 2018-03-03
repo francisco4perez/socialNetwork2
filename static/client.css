@@ -206,6 +206,11 @@ li a:hover:not(.active) {
 	text-align:right;
 	overflow: auto;
 }
+img#trash{
+		position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
 
 
 /* Browse style ------------------*/
