@@ -19,7 +19,7 @@ def insert_user(email,password,token,firstname, familyname, gender,city,country,
     result = []
     try:
 		#prepare statement to insert values in the users table
-        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,?)", [email,password,token,firstname, familyname, gender,city,country,salt])
+        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country,salt])
         g.db.commit()
         return True
     except:
@@ -153,6 +153,15 @@ def delete_message(id):
     try:
         #prepare statement to insert values in the messages table
 		cur = g.db.execute("delete from messages where id = ?", [id])
+		g.db.commit()
+		return True
+    except:
+        return False
+
+def post_profilepicture(token,image):
+    try:
+		#prepare statement to change the profile picture of a user
+		cur = g.db.execute("update users set profilepicture = ? where token = ?", [image,token])
 		g.db.commit()
 		return True
     except:

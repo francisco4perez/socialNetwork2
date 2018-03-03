@@ -485,7 +485,7 @@ function drop(ev) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("message");
     ev.target.appendChild(document.getElementById(data));
-    id = data.substr(4, 5); 
+    id = data.substr(4, 5);
     var token = localStorage.getItem("loggedinuser");
 
     var con = new XMLHttpRequest();
@@ -497,9 +497,25 @@ function drop(ev) {
     con.send(null);
 }
 
+// send a file (video or image to the server)
+function uploadfile(file){
+  var token = localStorage.getItem("loggedinuser");
+    var url = '/postprofilepicture/'+token;
+    var xhr = new XMLHttpRequest();
+    var fd = new FormData();
+    xhr.open("POST", url, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Every thing ok, file uploaded
+            console.log(xhr.responseText); // handle response.
+        }
+    };
+    fd.append("upload_file", file);
+    xhr.send(fd);
+}
+
 // Main function- Called when the page is loading
 window.onload = function(){
-
 
   displayview();
   //socket();

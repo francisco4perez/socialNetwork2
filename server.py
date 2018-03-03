@@ -269,6 +269,21 @@ def changePassword_data(token):
     else:
         return "", 404
 
+@app.route('/postprofilepicture/<token>', methods=['POST'])
+def post_profilepicture(token):
+    if token != None :
+        existtoken = database_helper.get_user_by_token(token)
+        #if this token doesn't exist in the database, return error status
+        if not existtoken:
+            return '{"success": false, "message": "You are not signed in."}', 401
+        image = request.content
+        print image
+        result = database_helper.post_profilepicture(token,image)
+        if not result:
+            return '{"success": false, "message": "Something went wrong."}', 500
+        return '{"success": true, "message": "Image added"}', 200
+    return '{"success": false, "message": "You are not signed in."}', 401
+
 
 if __name__ == '__main__':
 
