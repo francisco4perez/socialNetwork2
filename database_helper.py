@@ -135,7 +135,7 @@ def get_messages(email):
     cursor.close()
     # append all the messages
     for index in range(len(rows)):
-        result.append({"writer_id":rows[index][2], "content":rows[index][3]})
+        result.append({"id":rows[index][0],"writer_id":rows[index][2], "content":rows[index][3]})
     return result
 
 # insert a new message on the messages table with a content, a writer and and the current profile
@@ -143,6 +143,16 @@ def insert_message(user_id,writer, content):
     try:
 		#prepare statement to insert values in the messages table
 		cur = g.db.execute("insert into messages values(null,?,?,?)", [user_id,writer,content])
+		g.db.commit()
+		return True
+    except:
+        return False
+
+#delete a message on a profile with the specified content and writer
+def delete_message(id):
+    try:
+        #prepare statement to insert values in the messages table
+		cur = g.db.execute("delete from messages where id = ?", [id])
 		g.db.commit()
 		return True
     except:

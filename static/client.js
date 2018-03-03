@@ -392,13 +392,13 @@ displaymessages= function(){
           for (var i=0; i<messages.length;i++){
             //show messages and change style depending if the email is the current user's email
             if(messages[i].writer_id==currentuseremail){
-              result.innerHTML+="<div id='drag' draggable='true' ondragstart='drag(event)'><div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
+              result.innerHTML+="<div id='drag"+messages[i].id+"' draggable='true' ondragstart='drag(event)'><div class='postername'><span id='postername"+messages[i].id+"'></span></div><div class='postermessage'><span id='postermessage"+messages[i].id+"'></span></div>";
             }
             else{
-              result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div></div>";
+              result.innerHTML+="<div class='posternameothers'><span id='postername"+messages[i].id+"'></span></div><div class='postermessageothers'><span id='postermessage"+messages[i].id+"'></span></div></div>";
             }
-            document.getElementById("postername"+i).innerText=messages[i].writer_id;
-            document.getElementById("postermessage"+i).innerText=messages[i].content;
+            document.getElementById("postername"+messages[i].id).innerText=messages[i].writer_id;
+            document.getElementById("postermessage"+messages[i].id).innerText=messages[i].content;
           }
         }
       }
@@ -485,6 +485,16 @@ function drop(ev) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("message");
     ev.target.appendChild(document.getElementById(data));
+    id = data.substr(4, 5); 
+    var token = localStorage.getItem("loggedinuser");
+
+    var con = new XMLHttpRequest();
+    // open a new request to get messages of a profile according to his email
+    con.open("DELETE", '/deletemessage/'+token+'/'+id, true);
+
+    con.setRequestHeader("Content-Type", "application/json");
+    //send the request
+    con.send(null);
 }
 
 // Main function- Called when the page is loading
