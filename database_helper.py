@@ -158,10 +158,21 @@ def delete_message(id):
     except:
         return False
 
-def post_profilepicture(token,image):
+#modify the profile picture of a user with the given token
+def update_profilepicture(token,image):
     try:
 		#prepare statement to change the profile picture of a user
 		cur = g.db.execute("update users set profilepicture = ? where token = ?", [image,token])
+		g.db.commit()
+		return True
+    except:
+        return False
+
+#select the profile picture of a user given his email
+def get_profilepicture(email):
+    try:
+		#prepare statement to get the picture of a user
+		cur = g.db.execute("select profilepicture from users where email = ?", [email])
 		g.db.commit()
 		return True
     except:

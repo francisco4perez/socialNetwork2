@@ -6,6 +6,9 @@ import json
 import random
 import hashlib
 import uuid
+from PIL import Image
+from io import BytesIO
+
 
 app = Flask(__name__)
 app.debug = True
@@ -269,6 +272,7 @@ def changePassword_data(token):
     else:
         return "", 404
 
+#post the profile picture given a token of a user
 @app.route('/postprofilepicture/<token>', methods=['POST'])
 def post_profilepicture(token):
     if token != None :
@@ -276,14 +280,29 @@ def post_profilepicture(token):
         #if this token doesn't exist in the database, return error status
         if not existtoken:
             return '{"success": false, "message": "You are not signed in."}', 401
-        image = request.content
-        print image
-        result = database_helper.post_profilepicture(token,image)
+        # access the actual file
+        image =request.form.get('upload_file')
+        #insert the picture in the database
+        result = database_helper.update_profilepicture(token,image)
         if not result:
             return '{"success": false, "message": "Something went wrong."}', 500
         return '{"success": true, "message": "Image added"}', 200
     return '{"success": false, "message": "You are not signed in."}', 401
 
+#get the profile picture of a user given his email if the user is signed in
+@app.route('/getprofilepicturebytoken/<token>/<email>',methods=['GET'])
+def get_profile_picture_by_token(token,email):
+    if email != None :
+        exist = database_helper.get_user_by_token(token)
+        if exist:
+            #search picture in the database with the given email
+            result = database_helper.get_profilepicture(email)
+            print result
+            return result,200
+        else :
+            return '{"success": false, "message": "You are not signed in."}', 401
+    else:
+        return '{"success": false, "message": "Form data missing or incorrect type."}', 404
 
 if __name__ == '__main__':
 
