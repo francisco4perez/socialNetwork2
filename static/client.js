@@ -327,6 +327,27 @@ displayprofile = function(email=""){
       document.getElementById("homeemail").innerText=result.data.email;
       document.getElementById("homecity").innerText=result.data.city;
       document.getElementById("homecountry").innerText=result.data.country;
+
+      var con2 = new XMLHttpRequest();
+      // open a new request to get the profile picture
+      con2.open("GET", '/getprofilepicturebytoken/'+token+'/'+result.data.email, true);
+
+      // when the response is back, execute this function
+      con2.onreadystatechange = function () {
+        var resultdata =con2.payload;
+        if(con2.readyState == 4 && con2.status == 200){
+          var reader = new FileReader();
+          reader.onload = function(){
+            var dataURL = reader.result;
+            var output = document.getElementById("profilepicture");
+            output.src = dataURL;
+          };
+          reader.readAsDataURL(resultdata);
+        }
+      }
+      con2.setRequestHeader("Content-Type", "multipart/form-data");
+      //send the request with parameter
+      con2.send(null);
       displaymessages();
     }
   }
@@ -485,7 +506,7 @@ function drop(ev) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("message");
     ev.target.appendChild(document.getElementById(data));
-    id = data.substr(4, 5); 
+    id = data.substr(4, 5);
     var token = localStorage.getItem("loggedinuser");
 
     var con = new XMLHttpRequest();
@@ -497,9 +518,25 @@ function drop(ev) {
     con.send(null);
 }
 
+// send a file (video or image to the server)
+function uploadfile(file){
+  var token = localStorage.getItem("loggedinuser");
+    var url = '/postprofilepicture/'+token;
+    var xhr = new XMLHttpRequest();
+    var fd = new FormData();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Every thing ok, file uploaded
+            console.log(xhr.responseText); // handle response.
+        }
+    };
+    xhr.send(file[0]);
+}
+
 // Main function- Called when the page is loading
 window.onload = function(){
-
 
   displayview();
   //socket();

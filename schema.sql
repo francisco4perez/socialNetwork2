@@ -8,6 +8,7 @@ create table users(
     city text,
     country text,
     salt text,
+    profilepicture blob,
     primary key(email)
 );
 create table messages(
