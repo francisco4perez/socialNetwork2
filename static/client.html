@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
 		<title>Twidder</title>
-    	<meta charset="utf-8"/>
+    	<meta charset="utf-8">
+  		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     	<link href="static/bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet">
        	<link href="static/client.css" type="text/css" rel="stylesheet">
 
@@ -10,15 +11,15 @@
 
        <!-- Welcome View -->
 		<script id="welcomeview" type="text/view">
-			<div class="container">
+			<div class="container my_container">
 			<!-- logo and slogan -->
-			<div class="row">
-				<div class="col-md-11 col-sm-11 col-xs-11">
+			<div class="row my_row">
+				<div class="col-md-7 col-sm-12 col-12 no-right-padding">
 					<div id="left-side ">
-						<img src="static/images/wimage.png" alt="logoImage">
+						<img class="img-fluid" id="logoImage" src="static/images/wimage.png" alt="logoImage">
 					</div>
 				</div>
-				<div class="col-md-1 col-sm-1 col-xs-1">
+				<div class="col-md-5 col-sm-12 col-12 no-right-padding">
 
 					<div id="right-side">
 					<!-- Login -->
@@ -26,40 +27,118 @@
 						<h3> Log in here !</h3>
 						<form id="login-form" name="login-form" method="PUT" action="#" onsubmit="return signin()">
 							<div class="inner">
-								<div class="row"><label for="email" >Email* </label><input class="welcomeinput" type="email" id="emaillogin" name="emaillogin" oninput="return clearcustomvalidity(this)" required></div>
-								<div class="row"><label for="password" >Password* </label><input class="welcomeinput" type="password" id="passwordlogin" name="passwordlogin" required></div>
-								<!-- submit button for login-->
-								<button class="welcomebutton" type="submit">Login</button>
+								<div class="container">
+									<div class="row">
+										<label class="col-md-4 col-sm-6 col-6 col-form-label label-input" for="email" >Email* </label>
+										
+										<div class="col-md-8 col-sm-6 col-6">
+									        <input class="welcomeinput" type="email" id="emaillogin" name="emaillogin" oninput="return clearcustomvalidity(this)" required>
+									    </div>
+	
+									</div>
+									<div class="row">
+										<label class="col-md-4 col-sm-6 col-6 col-form-label label-input" for="password" >Password* </label>
+										
+										<div class="col-md-8 col-sm-6 col-6">
+											<input class="welcomeinput" type="password" id="passwordlogin" name="passwordlogin" required>
+										</div>
+									</div>
+									<!-- submit button for login-->
+									<div class="row">
+										<button class="welcomebutton" type="submit">Login</button>
+									</div>
+									
+								</div>
+								
 							</div>
 						</form>
 					</div>
 					<!-- Signup -->
-					<div id="signup">
-						<h3> Sign up here !</h3>
+					<div id="signup row">
+						<h3 id="h3-signup"> Sign up here !</h3>
 						<form id="sign-up-form" name ="sign-up-form"  method="PUT" action="#" onsubmit="return signup()">
 							<div class="inner">
-								<div class="row"><label for="firstname">First name* </label><input class="welcomeinput" type="text" id="firstname" name="firstname" required></div>
-								<div class="row"><label for="familyname" >Family name* </label><input class="welcomeinput" type="text" id="familyname" name="familyname" required></div>
-								<div class="row">
-									<label for="gender" >Gender* </label>
-										<select id="gender" name="gender">
-										  <option>Male</option>
-										  <option>Female</option>
-										</select>
+								<div class="container">
+								
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="firstname">First name* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="text" id="firstname" name="firstname" required>
+											</div>
+											
+										</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="familyname" >Family name* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="text" id="familyname" name="familyname" required>
+											</div>
+											
+										</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="gender" >Gender* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<select id="gender" name="gender">
+												  <option>Male</option>
+												  <option>Female</option>
+												</select>
+											</div>
+												
+										</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="city" >City* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="text" id="city" name="city" required>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="country" >Country* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="text" id="country" name="country" required>
+											</div>
+										</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="email">Email* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="email" id="emailsignup" name="emailsignup" oninput="return clearcustomvalidity(this)"required>
+											</div>
+											</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="password" >Password* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="password" id="passwordsignup" name="passwordsignup" oninput="return clearcustomvalidity(this)" required>
+											</div>
+											</div>
+										<div class="row">
+											<label class="col-md-6 col-sm-6 col-6 col-form-label label-input" for="repeatpassword" >Repeat pwd* </label>
+											
+											<div class="col-md-6 col-sm-6 col-6">
+												<input class="welcomeinput" type="password" id="repeatpassword" name="repeatpassword" oninput="return clearcustomvalidity(this)" required>
+											</div>
+											</div>
+										<div class="row">
+											<button class="welcomebutton" type="submit" id="signupbutton">Sign up</button>
+										</div>
+										<!-- submit button for sign up-->
+										
+
+									
 								</div>
-								<div class="row"><label for="city" >City* </label><input class="welcomeinput" type="text" id="city" name="city" required></div>
-								<div class="row"><label for="country" >Country* </label><input class="welcomeinput" type="text" id="country" name="country" required></div>
-								<div class="row"><label for="email">Email* </label><input class="welcomeinput" type="email" id="emailsignup" name="emailsignup" oninput="return clearcustomvalidity(this)"required></div>
-								<div class="row"><label for="password" >Password* </label><input class="welcomeinput" type="password" id="passwordsignup" name="passwordsignup" oninput="return clearcustomvalidity(this)" required></div>
-								<div class="row"><label for="repeatpassword" >Repeat pwd* </label><input class="welcomeinput" type="password" id="repeatpassword" name="repeatpassword" oninput="return clearcustomvalidity(this)" required></div>
-								<!-- submit button for sign up-->
-								<button class="welcomebutton" type="submit" id="signupbutton">Sign up</button>
+								
 							</div>
 						</form>
 					</div>
 				</div>
 					
 				</div>
+
+				
 				
 				
 			</div>
@@ -83,31 +162,71 @@
 			<!-- search bar to find other profile-->
 			<div id="browse">
 
-				<input type="text" class="inputprofile" id="search" name="searchbar" placeholder="Search for an address here" oninput="return clearcustomvalidity(this)" >
-				<img id="searchicon" src="static/images/searchicon.png" alt="searchicon" onclick="searchprofile()" ></img>
-				<div id="messageusername" ></div>
+				<div class="container my_container">
+					<div class="row">
+						<input type="text" class="inputprofile" id="search" name="searchbar" placeholder="Search for an address here" oninput="return clearcustomvalidity(this)" >
+					<img id="searchicon" src="/static/images/searchicon.png" alt="searchicon" onclick="searchprofile()" ></img>
+					<div id="messageusername" ></div>
+					</div>
+				</div>
+
+				
 			</div>
 
 			<!-- homeView with profile and wall-->
 			<div id="home">
-				<div id="profile">
-					<div ><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
-					<div id="homeusername" ></div>
-					<div id="homegender" ></div>
-					<div id="homecity" ></div>
-					<div id="homecountry" ></div>
-
-					<div id="homeemail"></div>
+				<div class="container my_container">
+					<div class="row my_row">
+						<div class="col-md-6 col-sm-12 col-12">
+							<div id="profile">
+								<div><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
+							</div>
+						</div>
+						
+						<div class="col-md-6 col-sm-12 col-12">
+							<div align="center" id="homeusername" ></div>
+							<div align="center" id="homegender" ></div>
+							<div align="center" id="homecity" ></div>
+							<div align="center" id="homecountry" ></div>
+							<div align="center" id="homeemail"></div>
+						</div>
+							
+					</div>
+					
 				</div>
 				<div id="wall">
+					<div class="container" align="center">
+						<div class="row my_row">
 
-					<input type="text" class="inputprofile" id="postmessage" name="postmessage" placeholder="Post a message to the wall here">
-					<button class="basicbutton" onclick="postmessage()" >Post message</button>
-					<button class="basicbutton" id="refreshbutton" onclick="displaymessages()">Refresh</button>
-					<div id="messages">
+							<div class="col-md-9 col-12 profile_btn">
+								<input type="text" class="inputprofile" id="postmessage" name="postmessage" placeholder="Post a message to the wall here">
+							</div>
+
+
+							<div class="col-md-2 col-6 profile_btn">
+								<button class="basicbutton" onclick="postmessage()" >Post message</button>
+							</div>
+
+							<div class="col-md-1 col-6 profile_btn">
+								<button class="basicbutton" id="refreshbutton" onclick="displaymessages()">Refresh</button>
+								
+			          			<img id="trash" src="static/images/rubbish-bin.png" alt="trash" ondrop="drop(event)" ondragover="allowDrop(event)">
+							</div>
+
+						</div>
+
+						<div class="row my_row">
+							<div class="text-justify text-truncate" id="messages">
+							</div>
+						</div>
+						
 					</div>
-          <img id="trash" src="static/images/rubbish-bin.png" alt="trash" ondrop="drop(event)" ondragover="allowDrop(event)">
+					
+
+					
 				</div>
+				</div>
+				
 			</div>
 		</script>
 
@@ -117,25 +236,63 @@
 			<div id="account">
 				<div class="container">
 					<div id="changepass">
-						<h2 id="title"> You can change your password here!</h2>
-						<form id="changepass-form" name="changepass-form" method="PUT" action="#" onsubmit="return changePassword()">
+						<div class="row">
+							<div class="col">
+								<h2 id="title"> You can change your password here!</h2>
+							</div>
+							
+						</div>
+						<div class="row">
+							<div class="col">
+								<form id="changepass-form" name="changepass-form" method="PUT" action="#" onsubmit="return changePassword()">
 							<div class="inner add_top_margin">
-								<div class="row"><label class="form_input_text label_pass" for="email" >Old Pass* </label><input class="welcomeinput" type="password" id="oldpass" oninput="return clearcustomvalidity(this)" required></div>
-								<div class="row"><label class="form_input_text label_pass" for="password" >New Pass* </label><input class="welcomeinput" type="password" id="newpass" oninput="return clearcustomvalidity(this)" required></div>
-								<div class="row"><label class="form_input_text label_pass" for="password" >Repeat New Pass* </label><input class="welcomeinput" type="password" id="repeatnewpass" oninput="return clearcustomvalidity(this)" required></div>
+								<div class="container">
+									
+								</div>
+								<div class="row small-container">
+									<div class="col">
+										<label class="form_input_text label_pass" for="email" >Old Pass* </label>
+									</div>
+									<div class="col">
+										<input class="welcomeinput" type="password" id="oldpass" oninput="return clearcustomvalidity(this)" required>
+									</div>
+								</div>
+									
+								</div>
+								<div class="row small-container">
+									<div class="col">
+										<label class="form_input_text label_pass" for="password" >New Pass* </label>
+									<input class="welcomeinput" type="password" id="newpass" oninput="return clearcustomvalidity(this)" required>
+									</div>
+									
+								</div>
+								<div class="row small-container">
+									<div class="col">
+										<label class="form_input_text label_pass" for="password" >Repeat Pass* </label>
+									<input class="welcomeinput" type="password" id="repeatnewpass" oninput="return clearcustomvalidity(this)" required>
+									</div>
+								</div>
 								<!-- submit button for changepass-->
 
 								<div class="center">
-									<button class="basicbutton add_top_margin" id="changepassbutton" type="submit">Change Password</button>
+									<div class="row small-container">
+										<button class="basicbutton add_top_margin" id="changepassbutton" type="submit">Change Password</button>
 
-									<button class="black_button add_top_margin" id="logoutbutton" onclick="signout()">Log out</button>
+										<button class="basicbutton black_button add_top_margin" id="logoutbutton" onclick="signout()">Log out</button>
+										<div class="add_top_margin" id="messagePass">
 
-									<div class="add_top_margin" id="messagePass">
+									</div>
+									
+									
 									</div>
 								</div>
 
 							</div>
 						</form>
+							</div>
+							
+						</div>
+						
 					</div>
 				</div>
 
