@@ -180,6 +180,15 @@
 						<div class="col-md-6 col-sm-12 col-12">
 							<div id="profile">
 								<div><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
+
+
+								<div class="input-group mb-3">
+								  <div class="custom-file">
+								    <input type="file" class="custom-file-input" id="uploadfiles" onchange="uploadfile(this.files)">
+								    <label class="custom-file-label" id="selectedfile" for="inputGroupFile01">Choose file</label>
+								  </div>
+								</div>
+
 							</div>
 						</div>
 						
@@ -193,14 +202,7 @@
 							
 					</div>
 					
-				<div id="profile">
-					<div ><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
-					<div id="homeusername" ></div>
-					<div id="homegender" ></div>
-					<div id="homecity" ></div>
-					<div id="homecountry" ></div>
-					<div id="homeemail"></div>
-          <input type="file" id="uploadfiles" onchange="uploadfile(this.files)"/>
+          			
 
 				</div>
 				<div id="wall">

@@ -535,6 +535,12 @@ function uploadfile(file){
     xhr.send(file[0]);
 }
 
+function changeinputname(){
+  input = document.getElementById("uploadfiles");
+  var label = document.getElementById("selectedfile");
+  label.value = input.files[0].name;
+}
+
 // Main function- Called when the page is loading
 window.onload = function(){
 
