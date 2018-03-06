@@ -6,6 +6,8 @@ import json
 import random
 import hashlib
 import uuid
+from PIL import Image
+from io import BytesIO
 
 
 app = Flask(__name__)
@@ -45,23 +47,23 @@ def verify_password(email, password):
 
 @app.route('/websocket')
 def web_socket():
+
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         there_is_email = False
         while True:
             email = ws.receive()
-            print "ws:" + email
+
             for key in email_socket_dict.keys():
                 if key == email:
                     there_is_email = True
 
             if there_is_email:
-                print web_socket
                 websocket = email_socket_dict[email]
                 websocket.send("signout")
 
             email_socket_dict[email] = ws
-    return ""
+
 
 
 
@@ -293,9 +295,8 @@ def get_profile_picture_by_token(token,email):
     if email != None :
         exist = database_helper.get_user_by_token(token)
         if exist:
-            result =""
             #search picture in the database with the given email
-            #result = database_helper.get_profilepicture(email)
+            result = database_helper.get_profilepicture(email)
             print result
             return result,200
         else :

@@ -90,10 +90,13 @@ signup = function(){
           "password": newProfile.password,
         };
         con.onreadystatechange = function () {
-          data = JSON.parse(con.responseText).data;
-          localStorage.setItem("loggedinuser",data);
-          // display profile of the current user
-          displayprofile();
+          if (con.readyState == 4 && con.status == 200) {
+            data = JSON.parse(con.responseText).data;
+            localStorage.setItem("loggedinuser",data);
+            // display profile of the current user
+            displayprofile();
+            socket(id.email);
+          }
         }
         con.setRequestHeader("Content-Type", "application/json");
         //send the request
@@ -328,26 +331,26 @@ displayprofile = function(email=""){
       document.getElementById("homecity").innerText=result.data.city;
       document.getElementById("homecountry").innerText=result.data.country;
 
-      var con2 = new XMLHttpRequest();
-      // open a new request to get the profile picture
-      con2.open("GET", '/getprofilepicturebytoken/'+token+'/'+result.data.email, true);
-
-      // when the response is back, execute this function
-      con2.onreadystatechange = function () {
-        var resultdata =con2.payload;
-        if(con2.readyState == 4 && con2.status == 200){
-          var reader = new FileReader();
-          reader.onload = function(){
-            var dataURL = reader.result;
-            var output = document.getElementById("profilepicture");
-            output.src = dataURL;
-          };
-          reader.readAsDataURL(resultdata);
-        }
-      }
-      con2.setRequestHeader("Content-Type", "multipart/form-data");
-      //send the request with parameter
-      con2.send(null);
+      // var con2 = new XMLHttpRequest();
+      // // open a new request to get the profile picture
+      // con2.open("GET", '/getprofilepicturebytoken/'+token+'/'+result.data.email, true);
+      //
+      // // when the response is back, execute this function
+      // con2.onreadystatechange = function () {
+      //   var resultdata =con2.payload;
+      //   if(con2.readyState == 4 && con2.status == 200){
+      //     var reader = new FileReader();
+      //     reader.onload = function(){
+      //       var dataURL = reader.result;
+      //       var output = document.getElementById("profilepicture");
+      //       output.src = dataURL;
+      //     };
+      //     reader.readAsDataURL(resultdata);
+      //   }
+      // }
+      // con2.setRequestHeader("Content-Type", "multipart/form-data");
+      // //send the request with parameter
+      // con2.send(null);
       displaymessages();
     }
   }
@@ -473,13 +476,12 @@ function onMessage(evt)
     	signout();
     	//websocket.close();
     }
-
   }
 
 function socket(email)
   {
   	url = "ws://localhost:5000/websocket";
-    websocket = new WebSocket(url);
+    var websocket = new WebSocket(url);
 
     websocket.onopen = function(event){
 

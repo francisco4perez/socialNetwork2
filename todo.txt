@@ -1,0 +1,3 @@
+medium view
+browse image
+change password
