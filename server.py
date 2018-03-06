@@ -245,20 +245,21 @@ def changePassword_data(token):
         result = database_helper.get_user_by_token(token)
 
         #verify if there is token
-        if len(result) != 0:
-            user = result[0]
-        else:
+        if len(result) == 0:
             return "There is no user with such token!", 200
 
         #json inputs
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
-
+        salt = database_helper.get_salt_by_email(result["email"])
+        if not salt:
+            return False
+        hashed_newpassword = hashlib.sha512(newPass + salt["salt"]).hexdigest()
         #to  if the oldpassword is right and has more lenght than six letters
-        if verify_password(user["email"],oldPass):
+        if verify_password(result["email"],oldPass):
             if len(newPass) >= 6:
                 #if changing is succesfull
-                if database_helper.update_password(token,oldPass,newPass):
+                if database_helper.update_password(token,oldPass,hashed_newpassword):
                     return '{"success": true, "message": "Password changed"}',200
                 else:
                     return '{"success": false, "message": "Updating went wrong!"}',500

@@ -232,7 +232,6 @@ changePassword = function(){
   var formData = document.forms["changepass-form"];
 
   if(validatePassForm()){
-    var oldPassId = document.getElementById("oldpass");
     var old_pass = formData.oldpass.value.trim();
     var new_pass = formData.newpass.value.trim();
 
@@ -251,6 +250,7 @@ changePassword = function(){
         messagePass.innerText = "The password was changed successfully!";
       }else if (con.status==500 || con.status==404){
         // show an error message
+        var oldPassId = document.getElementById("oldpass");
         oldPassId.setCustomValidity(JSON.parse(con.responseText).message);
         formData.reportValidity();
       }

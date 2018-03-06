@@ -15,11 +15,11 @@ def close_db():
         db.close()
 
 #Insert a new user in the database
-def insert_user(email,password,token,firstname, familyname, gender,city,country,salt):
+def insert_user(email,password,token,firstname, familyname, gender,city,country):
     result = []
     try:
 		#prepare statement to insert values in the users table
-        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country,salt])
+        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country])
         g.db.commit()
         return True
     except:
@@ -68,7 +68,6 @@ def delete_token_by_email(email):
 
 #update the password in the database
 def update_password(token,oldPassword,newPassword):
-    user = get_user_by_token(token)[0]
     query = g.db.execute("update users set password = ? where token = ?",[newPassword,token])
     g.db.commit()
     query.close()
@@ -113,19 +112,6 @@ def get_user_by_email_and_password(email,password):
     d["email"],d["firstname"],d["familyname"],d["gender"],d["city"],d["country"] = rows[0][0],rows[0][3],rows[0][4],rows[0][5],rows[0][6],rows[0][7]
     return d
 
-#get the salt of a given password
-def get_salt_by_email(email):
-    result=[]
-    # prepare statement to get the salt depending of the email
-    cursor = g.db.execute("select salt from users where email = ?", [email])
-    rows = cursor.fetchall()
-    cursor.close()
-    if not rows:
-        return None
-    d = {}
-    d["salt"]= rows[0][0]
-    return d
-
 #get all messages of a profile given his email
 def get_messages(email):
     result = []
@@ -135,7 +121,7 @@ def get_messages(email):
     cursor.close()
     # append all the messages
     for index in range(len(rows)):
-        result.append({"id":rows[index][0],"writer_id":rows[index][2], "content":rows[index][3]})
+        result.append({"writer_id":rows[index][2], "content":rows[index][3]})
     return result
 
 # insert a new message on the messages table with a content, a writer and and the current profile
@@ -148,32 +134,14 @@ def insert_message(user_id,writer, content):
     except:
         return False
 
-#delete a message on a profile with the specified content and writer
-def delete_message(id):
-    try:
-        #prepare statement to insert values in the messages table
-		cur = g.db.execute("delete from messages where id = ?", [id])
-		g.db.commit()
-		return True
-    except:
-        return False
-
-#modify the profile picture of a user with the given token
-def update_profilepicture(token,image):
-    try:
-		#prepare statement to change the profile picture of a user
-		cur = g.db.execute("update users set profilepicture = ? where token = ?", [image,token])
-		g.db.commit()
-		return True
-    except:
-        return False
-
-#select the profile picture of a user given his email
-def get_profilepicture(email):
-    try:
-		#prepare statement to get the picture of a user
-		cur = g.db.execute("select profilepicture from users where email = ?", [email])
-		g.db.commit()
-		return True
-    except:
-        return False
+def get_salt_by_email(email):
+    result=[]
+    # prepare statement to get values depending of the email and the token
+    cursor = g.db.execute("select salt from users where email = ?", [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    if not rows:
+        return None
+    d = {}
+    d["salt"]= rows[0][0]
+    return d
