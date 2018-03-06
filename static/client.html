@@ -181,14 +181,6 @@
 							<div id="profile">
 								<div><img id="profilepicture" src="static/images/profilePicture.png" alt="profileImage"></div>
 
-
-								<div class="input-group mb-3">
-								  <div class="custom-file">
-								    <input type="file" class="custom-file-input" id="uploadfiles" onchange="uploadfile(this.files)">
-								    <label class="custom-file-label" id="selectedfile" for="inputGroupFile01">Choose file</label>
-								  </div>
-								</div>
-
 							</div>
 						</div>
 						
@@ -201,6 +193,19 @@
 						</div>
 							
 					</div>
+
+					<div class="container">
+						<div class="row my_row">
+						<div class="input-group mb-3">
+						  <div class="custom-file">
+						    <input type="file" class="custom-file-input" id="uploadfiles" onchange="uploadfile(this.files)">
+						    <label class="custom-file-label" id="selectedfile" for="inputGroupFile01">Choose file</label>
+						  </div>
+						</div>
+					</div>
+					</div>
+
+					
 					
           			
 
@@ -209,16 +214,16 @@
 					<div class="container" align="center">
 						<div class="row my_row">
 
-							<div class="col-md-9 col-12 profile_btn">
+							<div class="col-md-9 col-sm-12 col-12 profile_btn">
 								<input type="text" class="inputprofile" id="postmessage" name="postmessage" placeholder="Post a message to the wall here">
 							</div>
 
 
-							<div class="col-md-2 col-6 profile_btn">
+							<div class="col-md-2 col-sm-12 col-6 profile_btn">
 								<button class="basicbutton" onclick="postmessage()" >Post message</button>
 							</div>
 
-							<div class="col-md-1 col-6 profile_btn">
+							<div class="col-md-1 col-sm-12 col-6 profile_btn">
 								<button class="basicbutton" id="refreshbutton" onclick="displaymessages()">Refresh</button>
 								
 			          			<img id="trash" src="static/images/rubbish-bin.png" alt="trash" ondrop="drop(event)" ondragover="allowDrop(event)">
