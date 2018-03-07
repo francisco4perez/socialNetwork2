@@ -121,7 +121,7 @@ def get_messages(email):
     cursor.close()
     # append all the messages
     for index in range(len(rows)):
-        result.append({"writer_id":rows[index][2], "content":rows[index][3]})
+        result.append({"id":rows[index][0],"writer_id":rows[index][2], "content":rows[index][3]})
     return result
 
 # insert a new message on the messages table with a content, a writer and and the current profile
@@ -145,3 +145,14 @@ def get_salt_by_email(email):
     d = {}
     d["salt"]= rows[0][0]
     return d
+
+def delete_message(id):
+    try:
+        # prepare statement to delete message with the corresponding id
+        cursor = g.db.execute("delete from messages where id = ?", [id])
+        g.db.commit()
+        rows = cursor.fetchall()
+        cursor.close()
+        return True
+    except:
+        return False

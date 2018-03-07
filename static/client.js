@@ -356,6 +356,11 @@ postmessage = function(){
       "email": email,
       "message": message
     };
+    con.onreadystatechange = function(){
+      if(con.readyState == 4 &&con.status == 200){
+        displaymessages();
+      }
+    }
     con.setRequestHeader("Content-Type", "application/json");
     //send the request with parameter
     con.send(JSON.stringify(messageJson));
@@ -423,7 +428,7 @@ searchprofile = function(){
 
   var con = new XMLHttpRequest();
   // open a new request to get messages of a profile according to his email
-  con.open("GET", '/getusermessagesbyemail/'+token+'/'+email, true);
+  con.open("GET", '/getdatabyemail/'+token+'/'+email, true);
 
   // when the response is back, execute this function
   con.onreadystatechange = function () {
@@ -436,9 +441,8 @@ searchprofile = function(){
     }else if(con.status==401|| con.status==404){
       //show the error message send by the server
       var message =JSON.parse(con.responseText).message;
-      var emailId=document.getElementById("search");
-      emailId.setCustomValidity(message);
-      emailId.reportValidity();
+
+      document.getElementById("messageusername").innerText=message;
       document.getElementById("home").style.display = "none";
     }
   }
