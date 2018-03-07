@@ -50,17 +50,17 @@ def web_socket():
         there_is_email = False
         while True:
             email = ws.receive()
-            print "ws:" + email
-            for key in email_socket_dict.keys():
-                if key == email:
-                    there_is_email = True
+            if email:
+                for key in email_socket_dict.keys():
+                    if key == email:
+                        there_is_email = True
 
-            if there_is_email:
-                print web_socket
-                websocket = email_socket_dict[email]
-                websocket.send("signout")
+                if there_is_email:
+                    print web_socket
+                    websocket = email_socket_dict[email]
+                    websocket.send("signout")
 
-            email_socket_dict[email] = ws
+                email_socket_dict[email] = ws
     return ""
 
 
@@ -81,12 +81,11 @@ def sign_in():
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
         result = database_helper.update_token(token,email)
+        print email_socket_dict
         if result :
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
             return '{"success": false, "message": "Wrong username or password."}', 501
-
-
     else:
         return '{"success": false, "message": "Wrong username or password."}', 501
 
