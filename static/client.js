@@ -147,7 +147,8 @@ signin = function(){
       localStorage.setItem("loggedinuser",data);
       // display profile of the current user
       displayprofile();
-      socket(email);
+        socket(email);
+
 
     }else  if (con.status==501){
       // else display an error message
@@ -170,7 +171,7 @@ clearcustomvalidity = function(field){
 }
 
 //Sign-out function called when the user wants to signout from the system
-signout = function(){
+signout = function(deletesocket=true){
   var token =localStorage.getItem("loggedinuser");
 
   if(token != null){
@@ -179,7 +180,8 @@ signout = function(){
 	con.open("PUT", '/signout', true);
 	// create the JSON parameters with email and password
 	var tokenJson = {
-	"token": token
+	"token": token,
+  "deletesocket":deletesocket
 	};
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
@@ -456,7 +458,7 @@ function onMessage(evt)
     var message = evt.data;
 
     if (message == "signout"){
-    	signout();
+    	signout(false);
     	//websocket.close();
     }
   }

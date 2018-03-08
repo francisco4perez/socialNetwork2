@@ -123,8 +123,10 @@ def sign_up():
 @app.route('/signout',methods=['PUT'])
 def sign_out():
     token = request.get_json()['token']
+    deletesocket = request.get_json()['deletesocket']
     result = database_helper.get_user_by_token(token)
-
+    if(deletesocket):
+        del email_socket_dict[result["email"]]
     if not result:
         return '{"success": false, "message": "No such token"}',400
 
@@ -244,7 +246,7 @@ def changePassword_data(token):
         result = database_helper.get_user_by_token(token)
 
         #verify if there is token
-        if len(result) == 0:
+        if not result:
             return "There is no user with such token!", 200
 
         #json inputs
