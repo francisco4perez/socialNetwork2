@@ -15,11 +15,11 @@ def close_db():
         db.close()
 
 #Insert a new user in the database
-def insert_user(email,password,token,firstname, familyname, gender,city,country):
+def insert_user(email,password,token,firstname, familyname, gender,city,country,salt):
     result = []
     try:
 		#prepare statement to insert values in the users table
-        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country])
+        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country,salt])
         g.db.commit()
         return True
     except:
