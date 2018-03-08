@@ -137,31 +137,32 @@ signin = function(){
     "email": email,
     "password": password,
   };
-  con.onreadystatechange = function () {
-    // if the user exist display his profile view and store the token in the local storage
-    if (con.readyState == 4 && con.status == 200) {
-      document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-      document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
-      //parse the data receive from the server
-      data = JSON.parse(con.responseText).data;
-      localStorage.setItem("loggedinuser",data);
-      // display profile of the current user
-      displayprofile();
-        socket(email);
+
+      con.onreadystatechange = function () {
+        // if the user exist display his profile view and store the token in the local storage
+        if (con.readyState == 4 && con.status == 200) {
+          document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+          document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
+          //parse the data receive from the server
+          data = JSON.parse(con.responseText).data;
+          localStorage.setItem("loggedinuser",data);
+          // display profile of the current user
+          displayprofile();
+          socket(email);
 
 
-    }else  if (con.status==501){
-      // else display an error message
-      var username = document.getElementById("emaillogin");
-      username.setCustomValidity(JSON.parse(con.responseText).message);
-      formData.reportValidity();
-    }
+        }else  if (con.readyState == 4 && con.status==501){
+          // else display an error message
+          var username = document.getElementById("emaillogin");
+          username.setCustomValidity(JSON.parse(con.responseText).message);
+          formData.reportValidity();
+        }
 
-  }
+      }
+
   con.setRequestHeader("Content-Type", "application/json");
   //send the request
   con.send(JSON.stringify(logform));
-
   return false;
 }
 
@@ -251,7 +252,7 @@ changePassword = function(){
 
       if(con.readyState == 4 && con.status == 200){
         messagePass.innerText = "The password was changed successfully!";
-      }else if (con.status==500 || con.status==404){
+      }else if (con.readyState == 4 && (con.status==500 || con.status==404)){
         // show an error message
         var oldPassId = document.getElementById("oldpass");
         oldPassId.setCustomValidity(JSON.parse(con.responseText).message);

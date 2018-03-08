@@ -81,7 +81,7 @@ def sign_in():
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
         result = database_helper.update_token(token,email)
-        print email_socket_dict
+
         if result :
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
@@ -273,7 +273,7 @@ def changePassword_data(token):
         else:
             return '{"success": false, "message": "Wrong old password!"}',500
     else:
-        return "", 404
+        return '{"success": false, "message": "no token"}', 404
 
 #post the profile picture given a token of a user
 @app.route('/postprofilepicture/<token>', methods=['POST'])
