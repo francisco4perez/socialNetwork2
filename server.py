@@ -116,7 +116,8 @@ def sign_up():
             else:
                 return '{"success": false, "message": "User already exists."}', 409
         return '{"success": false, "message": "Form data missing or incorrect type."}', 404
-    except:
+    except Exception as e:
+        print "SIGNUP_ERROR: "+ str(e)
         return '{"success": false, "message": "Something went wrong"}',500
 
 #method that delete the current session and the token
@@ -151,7 +152,8 @@ def get_user_data_by_token(token):
                 return '{"success": true, "message": "User data retrieved.", "data": ' + json.dumps(result) +'}',200
         else:
             return '{"success": false, "message": "You are not signed in."}', 401
-    except:
+    except Exception as e:
+        print "GETUSERBYTOKEN_ERROR: "+ str(e)
         return '{"success": false, "message": "Something went wrong"}',404
 
 #get data of a user given his email
@@ -222,7 +224,8 @@ def post_message():
                 return '{"success": false, "message": "this email does not exist"}', 401
         else :
             return '{"success": false, "message": "You are not signed in."}', 401
-    except:
+    except Exception as e:
+        print "POSTMESSAGE_ERROR: "+ str(e)
         return '{"success": false, "message": "Something went wrong"}',500
 
 @app.route('/deletemessage/<token>/<id>',methods=['DELETE'])

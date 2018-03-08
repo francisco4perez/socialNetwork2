@@ -232,6 +232,7 @@ validatePassForm = function() {
 changePassword = function(){
   var token = localStorage.getItem("loggedinuser");
   var formData = document.forms["changepass-form"];
+  var messagePass = document.getElementById("messagePass");
 
   if(validatePassForm()){
     var old_pass = formData.oldpass.value.trim();
