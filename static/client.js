@@ -154,6 +154,9 @@ signin = function(){
         }else  if (con.readyState == 4 && con.status==501){
           // else display an error message
           var username = document.getElementById("emaillogin");
+          var password = document.getElementById("passwordlogin");
+          username.value = "";
+          password.value = "";
           username.setCustomValidity(JSON.parse(con.responseText).message);
           formData.reportValidity();
         }
