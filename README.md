@@ -24,9 +24,9 @@ python server.py
 ```
 virtualenv venv
 ```
-1. Active virtual environment (In folder venv/bin on Linux or venv/Scripts on Windows execute command $ . activate or $ activate)
+2. Active virtual environment (In folder venv/bin on Linux or venv/Scripts on Windows execute command $ . activate or $ activate)
 
-2. Execute the following command in the root of the project:
+3. Execute the following command in the root of the project:
 
 ```
 pip install -r requirements.txt
