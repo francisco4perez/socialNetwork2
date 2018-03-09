@@ -8,10 +8,10 @@ body{
 	bottom:0px;
 	height: 100%;
 }
-.container{
+.my_container{
 	margin-left: auto;
     margin-right: auto;
-	width:600px;
+	max-width:650px;
 	margin-top:100px;
 }
 
@@ -22,16 +22,24 @@ body{
 h3{
 	text-align:center;
 	margin-top:inherit;
-	margin-bottom: 15px;
+	/*margin-bottom: 15px;*/
+	font-size: 20px;
 }
 #right-side{
 	float:right;
-	width:250px;
-	height:400px;
+	/*width:250px;*/
+	width: 100%;
+	min-height: 400px;
+	margin-bottom: 100px;
 	background-color: white;
 }
 #signup{
 	height: 273px;
+}
+
+.small-container{
+	max-width: 500px;
+	margin: auto;
 }
 
 
@@ -41,19 +49,38 @@ h3{
     height: 120px;
 }
 
-.row{
-	height:25px;
+.my_row{
+	/*height:25px;*/
 	padding :0px 10px 0px 10px;
+}
+
+#logoImage{
+	width: 100%;
+	max-height: 400px;
+	vertical-align: initial;
 }
 
 
 .welcomeinput {
-    width: 100px;
+    width: 130px;
     text-align: center;
     float: right;
-    height: 19px;
-    margin-right: 10px;
-	border-width: 2px;
+    height: 22px;
+    /*margin-top: 7px;*/
+    /*margin-right: 10px;*/
+	/*border-width: 2px;*/
+}
+
+
+
+.label-input{
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 5px;
+}
+
+.no-right-padding{
+	padding-right: 0px;
 }
 
 .welcomebutton {
@@ -66,18 +93,19 @@ h3{
 
 #gender {
     width: 104px;
+    min-width: 130px;
     float: right;
     box-sizing: border-box;
     height: 25px;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
 }
 
 
 label {
     margin-bottom: 0px;
     float: left;
-    margin-top: 5.5px;
-    margin-left: 15px;
+    /*margin-top: 5.5px;*/
+    /*margin-left: 15px;*/
 }
 
 .label_pass{
@@ -116,6 +144,12 @@ li a {
 
 li a:hover:not(.active) {
     background-color: #111;
+    color: red;
+}
+
+li a:hover{
+	text-decoration: none;
+	color: black;
 }
 
 .active {
@@ -125,14 +159,18 @@ li a:hover:not(.active) {
 
 /* profile part*/
 #profile{
-	margin-top:50px;
+	margin-top:12px;
 	margin-left:30%;
 }
 
 #profilepicture{
-	height:150px;
+	min-height:150px;
+	min-width: 108px;
+	height: auto
 	float:left;
 	margin-right:20px;
+	width: 60%;
+	margin-bottom: 20px;
 }
 
 #homeusername{
@@ -147,23 +185,34 @@ li a:hover:not(.active) {
 	margin-top:100px;
 }
 
+#account{
+	margin-top: 90px;
+}
+
 
 /* wall part -------------------*/
 
 .inputprofile{
-	padding: 10px 25px;
-	width:40%;
-	margin-left:20%;
+	padding: 14px 25px;
+	width:100%;
+	/*margin-left:20%;*/
 }
 .basicbutton{
 	 background-color: red;
     border: none;
     color: white;
-    padding: 16px 16px;
+    padding: 16px 6px;
     text-decoration: none;
-    margin: 4px 2px;
+    /*margin: 4px 2px;*/
     cursor: pointer;
+    min-width: 110px;
+    width: 100%;
 }
+
+.profile_btn{
+	padding: 0px;
+}
+
 #refreshbutton{
 	 background-color: black;
 }
@@ -178,8 +227,8 @@ li a:hover:not(.active) {
 #messages{
 
 	margin-top:20px;
-	margin-left:20%;
-	margin-right:20%;
+	/*margin-left:20%;
+	margin-right:20%;*/
 
 }
 
@@ -206,19 +255,31 @@ li a:hover:not(.active) {
 	text-align:right;
 	overflow: auto;
 }
+img#trash{
+		position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
 
 
 /* Browse style ------------------*/
 
 img#searchicon{
-	height:20px;
-	padding-top:30px;
+	height:30px;
 	cursor:pointer;
-	margin-left:-40px;
+	/*margin-left:-40px;*/
+	width:30px;
+	margin-top: 12px;
+	margin-right: 25px;
 }
 #search{
 	border-radius: 25px;
-	margin-left:25%;
+}
+.searchbar{
+	/*padding: 14px 25px;*/
+	width:100%;
+	margin-left: 20px;
+	margin-right: 20px;
 }
 
 #browse{
@@ -242,10 +303,7 @@ img#searchicon{
 
 .black_button{
 	background-color: black;
-    border: none;
-    color: white;
-    padding: 16px 16px;
     text-decoration: none;
-    margin: 4px 2px;
+    margin-top: 4px;
     cursor: pointer;
 }

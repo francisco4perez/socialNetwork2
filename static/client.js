@@ -30,7 +30,7 @@ displayview = function(){
   	 // else show the welcome view
 	  document.getElementById("maincontainer").innerHTML=document.getElementById("welcomeview").innerHTML;
   }
-  
+
 };
 
 // Function that validates the form
@@ -90,10 +90,13 @@ signup = function(){
           "password": newProfile.password,
         };
         con.onreadystatechange = function () {
-          data = JSON.parse(con.responseText).data;
-          localStorage.setItem("loggedinuser",data);
-          // display profile of the current user
-          displayprofile();
+          if (con.readyState == 4 && con.status == 200) {
+            data = JSON.parse(con.responseText).data;
+            localStorage.setItem("loggedinuser",data);
+            // display profile of the current user
+            displayprofile();
+            socket(id.email);
+          }
         }
         con.setRequestHeader("Content-Type", "application/json");
         //send the request
@@ -134,30 +137,35 @@ signin = function(){
     "email": email,
     "password": password,
   };
-  con.onreadystatechange = function () {
-    // if the user exist display his profile view and store the token in the local storage
-    if (con.readyState == 4 && con.status == 200) {
-      document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
-      document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
-      //parse the data receive from the server
-      data = JSON.parse(con.responseText).data;
-      localStorage.setItem("loggedinuser",data);
-      // display profile of the current user
-      displayprofile();
-      socket(email);
 
-    }else  if (con.status==501){
-      // else display an error message
-      var username = document.getElementById("emaillogin");
-      username.setCustomValidity(JSON.parse(con.responseText).message);
-      formData.reportValidity();
-    }
+      con.onreadystatechange = function () {
+        // if the user exist display his profile view and store the token in the local storage
+        if (con.readyState == 4 && con.status == 200) {
+          document.getElementById("navcontainer").innerHTML=document.getElementById("navview").innerHTML;
+          document.getElementById("maincontainer").innerHTML=document.getElementById("profileview").innerHTML;
+          //parse the data receive from the server
+          data = JSON.parse(con.responseText).data;
+          localStorage.setItem("loggedinuser",data);
+          // display profile of the current user
+          displayprofile();
+          socket(email);
 
-  }
+
+        }else  if (con.readyState == 4 && con.status==501){
+          // else display an error message
+          var username = document.getElementById("emaillogin");
+          var password = document.getElementById("passwordlogin");
+          username.value = "";
+          password.value = "";
+          username.setCustomValidity(JSON.parse(con.responseText).message);
+          formData.reportValidity();
+        }
+
+      }
+
   con.setRequestHeader("Content-Type", "application/json");
   //send the request
   con.send(JSON.stringify(logform));
-
   return false;
 }
 
@@ -167,7 +175,7 @@ clearcustomvalidity = function(field){
 }
 
 //Sign-out function called when the user wants to signout from the system
-signout = function(){
+signout = function(deletesocket=true){
   var token =localStorage.getItem("loggedinuser");
 
   if(token != null){
@@ -176,7 +184,8 @@ signout = function(){
 	con.open("PUT", '/signout', true);
 	// create the JSON parameters with email and password
 	var tokenJson = {
-	"token": token
+	"token": token,
+  "deletesocket":deletesocket
 	};
 	// when the response is back, execute this function
 	con.onreadystatechange = function () {
@@ -193,7 +202,7 @@ signout = function(){
 	//send the request with parameter
 	con.send(JSON.stringify(tokenJson));
   }
-  
+
 }
 
 //Function to validate the forms in account view
@@ -227,9 +236,9 @@ validatePassForm = function() {
 changePassword = function(){
   var token = localStorage.getItem("loggedinuser");
   var formData = document.forms["changepass-form"];
+  var messagePass = document.getElementById("messagePass");
 
   if(validatePassForm()){
-    var oldPassId = document.getElementById("oldpass");
     var old_pass = formData.oldpass.value.trim();
     var new_pass = formData.newpass.value.trim();
 
@@ -246,8 +255,9 @@ changePassword = function(){
 
       if(con.readyState == 4 && con.status == 200){
         messagePass.innerText = "The password was changed successfully!";
-      }else if (con.status==500 || con.status==404){
+      }else if (con.readyState == 4 && (con.status==500 || con.status==404)){
         // show an error message
+        var oldPassId = document.getElementById("oldpass");
         oldPassId.setCustomValidity(JSON.parse(con.responseText).message);
         formData.reportValidity();
       }
@@ -353,6 +363,11 @@ postmessage = function(){
       "email": email,
       "message": message
     };
+    con.onreadystatechange = function(){
+      if(con.readyState == 4 &&con.status == 200){
+        displaymessages();
+      }
+    }
     con.setRequestHeader("Content-Type", "application/json");
     //send the request with parameter
     con.send(JSON.stringify(messageJson));
@@ -392,13 +407,13 @@ displaymessages= function(){
           for (var i=0; i<messages.length;i++){
             //show messages and change style depending if the email is the current user's email
             if(messages[i].writer_id==currentuseremail){
-              result.innerHTML+="<div class='postername'><span id='postername"+i+"'></span></div><div class='postermessage'><span id='postermessage"+i+"'></span></div>";
+              result.innerHTML+="<div id='drag"+messages[i].id+"' draggable='true' ondragstart='drag(event)'><div class='postername'><span id='postername"+messages[i].id+"'></span></div><div class='postermessage'><span id='postermessage"+messages[i].id+"'></span></div>";
             }
             else{
-              result.innerHTML+="<div class='posternameothers'><span id='postername"+i+"'></span></div><div class='postermessageothers'><span id='postermessage"+i+"'></span></div>";
+              result.innerHTML+="<div class='posternameothers'><span id='postername"+messages[i].id+"'></span></div><div class='postermessageothers'><span id='postermessage"+messages[i].id+"'></span></div></div>";
             }
-            document.getElementById("postername"+i).innerText=messages[i].writer_id;
-            document.getElementById("postermessage"+i).innerText=messages[i].content;
+            document.getElementById("postername"+messages[i].id).innerText=messages[i].writer_id;
+            document.getElementById("postermessage"+messages[i].id).innerText=messages[i].content;
           }
         }
       }
@@ -420,7 +435,7 @@ searchprofile = function(){
 
   var con = new XMLHttpRequest();
   // open a new request to get messages of a profile according to his email
-  con.open("GET", '/getusermessagesbyemail/'+token+'/'+email, true);
+  con.open("GET", '/getdatabyemail/'+token+'/'+email, true);
 
   // when the response is back, execute this function
   con.onreadystatechange = function () {
@@ -433,9 +448,8 @@ searchprofile = function(){
     }else if(con.status==401|| con.status==404){
       //show the error message send by the server
       var message =JSON.parse(con.responseText).message;
-      var emailId=document.getElementById("search");
-      emailId.setCustomValidity(message);
-      emailId.reportValidity();
+
+      document.getElementById("messageusername").innerText=message;
       document.getElementById("home").style.display = "none";
     }
   }
@@ -447,18 +461,17 @@ searchprofile = function(){
 function onMessage(evt)
   {
     var message = evt.data;
-    
+
     if (message == "signout"){
-    	signout();
+    	signout(false);
     	//websocket.close();
     }
-    
   }
 
 function socket(email)
   {
   	url = "ws://localhost:5000/websocket";
-    websocket = new WebSocket(url);
+    var websocket = new WebSocket(url);
 
     websocket.onopen = function(event){
 
@@ -470,10 +483,36 @@ function socket(email)
     websocket.onerror = function(evt) { onError(evt) };
   }
 
+// function called when one of the message is dragged to put it in the trash
+function drag(ev)
+{
+   ev.dataTransfer.setData("message", ev.target.id);
+}
+// allow to drop something on the trash
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+// action when the message is drop on the trash, send a delete message to the server
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("message");
+    ev.target.appendChild(document.getElementById(data));
+    id = data.substr(4, 5);
+    var token = localStorage.getItem("loggedinuser");
+
+    var con = new XMLHttpRequest();
+    // open a new request to get messages of a profile according to his email
+    con.open("DELETE", '/deletemessage/'+token+'/'+id, true);
+
+    con.setRequestHeader("Content-Type", "application/json");
+    //send the request
+    con.send(null);
+}
+
 
 // Main function- Called when the page is loading
 window.onload = function(){
-
 
   displayview();
   //socket();

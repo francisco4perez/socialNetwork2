@@ -15,11 +15,11 @@ def close_db():
         db.close()
 
 #Insert a new user in the database
-def insert_user(email,password,token,firstname, familyname, gender,city,country):
+def insert_user(email,password,token,firstname, familyname, gender,city,country,salt):
     result = []
     try:
 		#prepare statement to insert values in the users table
-        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?)", [email,password,token,firstname, familyname, gender,city,country])
+        cur = g.db.execute("insert into users values(?,?,?,?,?,?,?,?,?,null)", [email,password,token,firstname, familyname, gender,city,country,salt])
         g.db.commit()
         return True
     except:
@@ -68,7 +68,6 @@ def delete_token_by_email(email):
 
 #update the password in the database
 def update_password(token,oldPassword,newPassword):
-    user = get_user_by_token(token)[0]
     query = g.db.execute("update users set password = ? where token = ?",[newPassword,token])
     g.db.commit()
     query.close()
@@ -122,7 +121,7 @@ def get_messages(email):
     cursor.close()
     # append all the messages
     for index in range(len(rows)):
-        result.append({"writer_id":rows[index][2], "content":rows[index][3]})
+        result.append({"id":rows[index][0],"writer_id":rows[index][2], "content":rows[index][3]})
     return result
 
 # insert a new message on the messages table with a content, a writer and and the current profile
@@ -132,5 +131,28 @@ def insert_message(user_id,writer, content):
 		cur = g.db.execute("insert into messages values(null,?,?,?)", [user_id,writer,content])
 		g.db.commit()
 		return True
+    except:
+        return False
+
+def get_salt_by_email(email):
+    result=[]
+    # prepare statement to get values depending of the email and the token
+    cursor = g.db.execute("select salt from users where email = ?", [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    if not rows:
+        return None
+    d = {}
+    d["salt"]= rows[0][0]
+    return d
+
+def delete_message(id):
+    try:
+        # prepare statement to delete message with the corresponding id
+        cursor = g.db.execute("delete from messages where id = ?", [id])
+        g.db.commit()
+        rows = cursor.fetchall()
+        cursor.close()
+        return True
     except:
         return False

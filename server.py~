@@ -1,13 +1,19 @@
 from gevent.wsgi import WSGIServer
-from flask import app, request
-from flask import Flask
+from geventwebsocket.handler import WebSocketHandler
+from flask import Flask, app, request
 import database_helper
 import json
 import random
+import hashlib
+import uuid
+from PIL import Image
+from io import BytesIO
+
 
 app = Flask(__name__)
 app.debug = True
 
+email_socket_dict = {}
 
 #Connect database before request
 @app.before_request
@@ -26,14 +32,40 @@ def main():
 
 #return true if the email and password in parameter correspond to a profile in the database
 def verify_password(email, password):
-    result = database_helper.get_user_by_email_and_password(email,password)
+    salt = database_helper.get_salt_by_email(email)
+    if not salt:
+        return False
+    hashed_password = hashlib.sha512(password + salt["salt"]).hexdigest()
+    result = database_helper.get_user_by_email_and_password(email,hashed_password)
     try :
-        if result and len(password)>=6:
+        if result:
             return True
         else :
             return False
     except:
         return False
+
+@app.route('/websocket')
+def web_socket():
+
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        there_is_email = False
+        while True:
+            email = ws.receive()
+
+            for key in email_socket_dict.keys():
+                if key == email:
+                    there_is_email = True
+
+            if there_is_email:
+                websocket = email_socket_dict[email]
+                websocket.send("signout")
+
+            email_socket_dict[email] = ws
+
+
+
 
 #method that return true if the user with the password and email in parameters exists
 @app.route('/signin', methods=['PUT'])
@@ -43,9 +75,10 @@ def sign_in():
     password = request.get_json()['password']
     # verify that the user exists
     if verify_password(email,password):
+
+        token = ""
         #create a random token
         letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-        token = ""
         for i in range(36) :
             token += letters[int(random.uniform(0,36))]
         # insert token in the database
@@ -54,6 +87,8 @@ def sign_in():
             return '{"success": true, "message": "Successfully signed in.", "data":"'+str(token)+'"}', 200
         else :
             return '{"success": false, "message": "Wrong username or password."}', 501
+
+
     else:
         return '{"success": false, "message": "Wrong username or password."}', 501
 
@@ -61,7 +96,6 @@ def sign_in():
 @app.route('/signup',methods=['PUT'])
 def sign_up():
     try:
-        print "hello"
         # get all parameters
         email = request.get_json()['email']
         password = request.get_json()['password']
@@ -77,7 +111,10 @@ def sign_up():
             exist = database_helper.get_user_by_email(email)
             # if the user doesn't already exist, add the new profile in the database
             if not exist:
-                database_helper.insert_user(email,password,"",firstname,familyname,gender,city,country)
+                #hash of the password with salt
+                salt = uuid.uuid4().hex
+                hashed_password = hashlib.sha512(password + salt).hexdigest()
+                database_helper.insert_user(email,hashed_password,"",firstname,familyname,gender,city,country,salt)
                 return '{"success": true, "message": "Successfully created a new user."}', 200
             else:
                 return '{"success": false, "message": "User already exists."}', 409
@@ -91,7 +128,7 @@ def sign_out():
     token = request.get_json()['token']
     result = database_helper.get_user_by_token(token)
 
-    if len(result) == 0:
+    if not result:
         return '{"success": false, "message": "No such token"}',400
 
     if token != None:
@@ -106,14 +143,17 @@ def sign_out():
 #get data of a user given his token
 @app.route('/getdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token):
-    if token != None :
-        result = database_helper.get_user_by_token(token)
-        if len(result) == 0:
-            return '{"success": false, "message": "No such user."}', 404
+    try:
+        if token != None :
+            result = database_helper.get_user_by_token(token)
+            if len(result) == 0:
+                return '{"success": false, "message": "No such user."}', 404
+            else:
+                return '{"success": true, "message": "User data retrieved.", "data": ' + json.dumps(result) +'}',200
         else:
-            return '{"success": true, "message": "User data retrieved.", "data": ' + json.dumps(result) +'}',200
-    else:
-        return '{"success": false, "message": "You are not signed in."}', 401
+            return '{"success": false, "message": "You are not signed in."}', 401
+    except:
+        return '{"success": false, "message": "Something went wrong"}',404
 
 #get data of a user given his email
 @app.route('/getdatabyemail/<token>/<email>', methods=['GET'])
@@ -152,7 +192,7 @@ def get_user_messages_by_email(token,email):
     if email != None :
         exist = database_helper.get_user_by_token(token)
         if exist:
-            #search messages in the database with th given email
+            #search messages in the database with the given email
             result = database_helper.get_messages(email)
             return '{"success": true, "message": "User messages retrieved.", "data":' + json.dumps(result) +'}',200
         else :
@@ -186,6 +226,20 @@ def post_message():
     except:
         return '{"success": false, "message": "Something went wrong"}',500
 
+@app.route('/deletemessage/<token>/<id>',methods=['DELETE'])
+def delete_message(token,id):
+    if token != None :
+        existtoken = database_helper.get_user_by_token(token)
+        #if this token doesn't exist in the database, return error status
+        if not existtoken:
+            return '{"success": false, "message": "You are not signed in."}', 401
+        result = database_helper.delete_message(id)
+        if not result:
+            return '{"success": false, "message": "An error occured when trying to find this message"}', 500
+        return '{"success": true, "message": "message deleted with success"}',200
+    else:
+        return '{"success": false, "message": "You are not signed in."}', 401
+
 #Function to change password by given token
 @app.route('/changepassword/<token>', methods=['POST'])
 def changePassword_data(token):
@@ -202,9 +256,9 @@ def changePassword_data(token):
         oldPass = request.get_json()["oldpass"]
         newPass = request.get_json()["newpass"]
 
-        #to verify if the oldpassword is right and has more lenght than six letters
+        #to  if the oldpassword is right and has more lenght than six letters
         if verify_password(user["email"],oldPass):
-            if len(oldPass) >= 6:
+            if len(newPass) >= 6:
                 #if changing is succesfull
                 if database_helper.update_password(token,oldPass,newPass):
                     return '{"success": true, "message": "Password changed"}',200
@@ -218,8 +272,39 @@ def changePassword_data(token):
     else:
         return "", 404
 
+#post the profile picture given a token of a user
+@app.route('/postprofilepicture/<token>', methods=['POST'])
+def post_profilepicture(token):
+    if token != None :
+        existtoken = database_helper.get_user_by_token(token)
+        #if this token doesn't exist in the database, return error status
+        if not existtoken:
+            return '{"success": false, "message": "You are not signed in."}', 401
+        # access the actual file
+        image =request.form.get('upload_file')
+        #insert the picture in the database
+        result = database_helper.update_profilepicture(token,image)
+        if not result:
+            return '{"success": false, "message": "Something went wrong."}', 500
+        return '{"success": true, "message": "Image added"}', 200
+    return '{"success": false, "message": "You are not signed in."}', 401
+
+#get the profile picture of a user given his email if the user is signed in
+@app.route('/getprofilepicturebytoken/<token>/<email>',methods=['GET'])
+def get_profile_picture_by_token(token,email):
+    if email != None :
+        exist = database_helper.get_user_by_token(token)
+        if exist:
+            #search picture in the database with the given email
+            result = database_helper.get_profilepicture(email)
+            print result
+            return result,200
+        else :
+            return '{"success": false, "message": "You are not signed in."}', 401
+    else:
+        return '{"success": false, "message": "Form data missing or incorrect type."}', 404
 
 if __name__ == '__main__':
 
-    http_server = WSGIServer(('', 5000), app)
+    http_server = WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
